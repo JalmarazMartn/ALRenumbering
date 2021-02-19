@@ -4,6 +4,7 @@
 	"description": "AL Renumber from CSv File",
 	"publisher": "Jalmaraz",	
 	"version": "0.0.1",
+	"repository": "{https://github.com/JalmarazMartn/ALRenumbering}",
 	"engines": {
 		"vscode": "^1.53.0"
 	},
