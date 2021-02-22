@@ -6,8 +6,18 @@ module.exports = {
 	GetWorkspaceObjects: function (
 	) {
 		return GetWorkspaceObjects();
+	},
+	RenumberObjects : function () 
+	{
+			ProcessRenumFile(ProcessWorkSpace);
+		},
+	CreateNewCSVFile: function(){
+		let EmptyRenumberJSON = [];
+		CreateCSVFile(EmptyRenumberJSON);
 	}
-}
+
+	
+	}
 
 async function ProcessWorkSpace(RenumberJSON = []) {
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
@@ -45,8 +55,8 @@ function FindNumberRelation(FirstLine, RenumberJSON) {
 	if (RenumberCurrent) {
 		NumberRelation.OldID = RenumberCurrent.PreviousID;
 		NumberRelation.NewID = RenumberCurrent.NewID;
-		return NumberRelation;
 	}
+	return NumberRelation;
 }
 function GetCurrentObject(FirstLine = '') {
 	var CurrentObject =
@@ -74,7 +84,6 @@ async function GetWorkspaceObjects() {
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const FirstLine = ALDocument.lineAt(0).text;
-		console.log(FirstLine);
 		var CurrentObject = GetCurrentObject(FirstLine);
 		if (CurrentObject.ObjectID !== '') {
 			WorkspaceObjects.push(CurrentObject);
@@ -89,4 +98,62 @@ function SortObjects(a, b) {
 	else {
 		return -1;
 	}
+}
+async function ProcessRenumFile(EndProccesingFuntcion) {
+	var RenumberJSON = [];
+	const options = {
+		canSelectMany: false,
+		openLabel: 'Open',
+		title: 'Select CSV File',
+		filters: {
+			'csv': ['csv'],
+		}
+	};
+	let fileUri = await vscode.window.showOpenDialog(options);
+	var fs = require('fs'),
+		readline = require('readline');
+
+	var rd = readline.createInterface({
+		input: fs.createReadStream(fileUri[0].fsPath)
+
+	});
+	rd.on('line', function (line) {
+		const Elements = line.split(';');
+		RenumberJSON.push(
+			{
+				"ObjectType": Elements[0],
+				"PreviousID": Elements[1],
+				"NewID": Elements[3]
+			});
+	});
+	rd.on('close', EndProccesingFuntcion(RenumberJSON));
+}
+async function CreateCSVFile(RenumberJSON)
+{
+	const sep = ';';
+	const carriage = '\r\n';
+	var WorkspaceObjects = await GetWorkspaceObjects();
+	const options = {
+		canSelectMany: false,
+		openLabel: 'Save',
+		title: 'Select CSV File',
+		filters: {
+			'csv': ['csv'],
+		}
+	};	
+	let fileUri = await vscode.window.showSaveDialog(options);	
+	var LineText = 'ObjectType' +sep + 'OldId' +sep + 'Name'+sep + 'NewId'+ carriage;
+	let NewId = '';
+	let DeclarationText = '';
+	for (let index = 0; index < WorkspaceObjects.length; index++) {
+		if (RenumberJSON)
+		{
+			DeclarationText = WorkspaceObjects[index].ObjectType + ' ' + WorkspaceObjects[index].ObjectID;
+			NewId = FindNumberRelation(DeclarationText,RenumberJSON).NewID;
+		}
+		LineText = LineText + WorkspaceObjects[index].ObjectType +sep + WorkspaceObjects[index].ObjectID +sep + 
+				WorkspaceObjects[index].ObjectName+sep+NewId+carriage;		
+	}	
+	await vscode.workspace.fs.writeFile(fileUri,Buffer.from(LineText));
+	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
 }
