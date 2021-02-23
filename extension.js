@@ -16,6 +16,12 @@ function activate(context) {
 		Library.CreateNewCSVFile();
 	});
 	context.subscriptions.push(CreateCSVSubs);
+	let UpdatePreviousCSVFile = vscode.commands.registerCommand('JAMRenumbering.UpdatePreviousCSVFile', function () {
+		const Library = require('./src/Library.js');		
+		Library.UpdatePreviousCSVFile();
+	});
+	context.subscriptions.push(UpdatePreviousCSVFile);
+
 }
 // @ts-ignore
 exports.activate = activate;

@@ -17,7 +17,8 @@
 	],
 	"activationEvents": [
 		"onCommand:JAMRenumbering.Renumber",
-		"onCommand:JAMRenumbering.CreateCSVFile"
+		"onCommand:JAMRenumbering.CreateCSVFile",
+		"onCommand:JAMRenumbering.UpdatePreviousCSVFile"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -29,6 +30,9 @@
 			{
 				"command": "JAMRenumbering.CreateCSVFile",
 				"title": "JAM Create Initial CSV ready for fill new ids"
+			},
+			{"command": "JAMRenumbering.UpdatePreviousCSVFile",
+			"title": "JAM Update previous CSV Renumbering file with new objects in workspace"
 			}
 
 		]

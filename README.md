@@ -24,6 +24,9 @@ Command will ask the source CSV file with the renumbering and execute renumberin
 
 ![alt text](./Step4.png)
 
+New command "JAM Update previous CSV Renumbering file with new objects in workspace", merge an existing CSV objects with set renumbering with new objects in workspace. The steps are: F1 "JAM Update previous CSV Renumbering file with new objects in workspace", select previous CSV file and then select target new merged file. They can be the same.
+
+
 ## Requirements
 
 Visual Studio Code and AL language.

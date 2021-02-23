@@ -14,8 +14,10 @@ module.exports = {
 	CreateNewCSVFile: function(){
 		let EmptyRenumberJSON = [];
 		CreateCSVFile(EmptyRenumberJSON);
-	}
-
+	},
+UpdatePreviousCSVFile: function(){
+	ProcessRenumFile(CreateCSVFile);
+}
 	
 	}
 
@@ -148,7 +150,8 @@ async function CreateCSVFile(RenumberJSON)
 	for (let index = 0; index < WorkspaceObjects.length; index++) {
 		if (RenumberJSON)
 		{
-			DeclarationText = WorkspaceObjects[index].ObjectType + ' ' + WorkspaceObjects[index].ObjectID;
+			DeclarationText = WorkspaceObjects[index].ObjectType + ' ' + WorkspaceObjects[index].ObjectID +
+			 ' ' + WorkspaceObjects[index].ObjectName;
 			NewId = FindNumberRelation(DeclarationText,RenumberJSON).NewID;
 		}
 		LineText = LineText + WorkspaceObjects[index].ObjectType +sep + WorkspaceObjects[index].ObjectID +sep + 
