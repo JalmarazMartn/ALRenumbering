@@ -51,7 +51,7 @@ function FindNumberRelation(FirstLine, RenumberJSON) {
 	if (!CurrentObject) {
 		return NumberRelation;
 	}
-	var RenumberCurrent = (RenumberJSON.find(RenumberJSON => (RenumberJSON.ObjectType.toUpperCase == CurrentObject.ObjectType.toUpperCase)
+	var RenumberCurrent = (RenumberJSON.find(RenumberJSON => (RenumberJSON.ObjectType == CurrentObject.ObjectType)
 		&& (RenumberJSON.PreviousID == CurrentObject.ObjectID)
 	))
 	if (RenumberCurrent) {
