@@ -8,21 +8,21 @@ This Renumber implementation has two commands: "Create initial CSV file" and "JA
 
 Go to command palette and find "JAM Create initial CSV file":
 
-![alt text](./Step1.png)
+![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/CreateFile.gif?raw=true)
 
 This command create a CSV template from workspace objects with NewID empty:
 
-![alt text](./Step2.png)
+![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EditExcel.gif?raw=true)
 
 When you fill this column, you can go to next step: Renumber. The command will ask where you want to save CSV file.
 
 Go to Command palette and find "JAM Renumber Al Objects from CSV file":
 
-![alt text](./Step3.png)
+![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/Renum.gif?raw=true)
 
 Command will ask the source CSV file with the renumbering and execute renumbering over all AL objects in current workspace. At the end of command changed objects will be open in the editor, and then you can review and save all or discard this renumbering:
 
-![alt text](./Step4.png)
+![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/SaveAll.png?raw=true)
 
 New command "JAM Update previous CSV Renumbering file with new objects in workspace", merge an existing CSV objects with set renumbering with new objects in workspace. The steps are: F1 "JAM Update previous CSV Renumbering file with new objects in workspace", select previous CSV file and then select target new merged file. They can be the same.
 
