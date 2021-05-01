@@ -21,7 +21,13 @@ function activate(context) {
 		Library.UpdatePreviousCSVFile();
 	});
 	context.subscriptions.push(UpdatePreviousCSVFile);
+	context.subscriptions.push(CreateCSVSubs);
 
+	let CreateTableObjectsWithoutLogic = vscode.commands.registerCommand('JAMRenumbering.CreateTableObjectsWithoutLogic', function () {
+		const Library = require('./src/Library.js');		
+		Library.CreateTableObjectsWithoutLogic();
+	});
+	context.subscriptions.push(CreateTableObjectsWithoutLogic);	
 }
 // @ts-ignore
 exports.activate = activate;
