@@ -1,4 +1,3 @@
-//Si es extension sin keys
 //Enums
 //Formato
 
@@ -66,7 +65,7 @@ async function WriteFileWithOutCode(ALDocument, FolderName = '') {
 	FinalText = FinalText + '}';
 	const OnlyName = ALDocument.uri.path.replace(/^.*[\\\/]/, '')
 	const fileUri = vscode.Uri.file(FolderName + '/' + 'Empty.' + OnlyName);
-	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
+	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));	
 }
 function GetFinalFieldsText(ALDocument)
 {
