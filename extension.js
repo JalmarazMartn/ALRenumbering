@@ -24,8 +24,8 @@ function activate(context) {
 	context.subscriptions.push(CreateCSVSubs);
 
 	let CreateTableObjectsWithoutLogic = vscode.commands.registerCommand('JAMRenumbering.CreateTableObjectsWithoutLogic', function () {
-		const Library = require('./src/Library.js');		
-		Library.CreateTableObjectsWithoutLogic();
+		const EmptyObjects = require('./src/EmptyObjects.js');		
+		EmptyObjects.CreateTableObjectsWithoutLogic();
 	});
 	context.subscriptions.push(CreateTableObjectsWithoutLogic);	
 }

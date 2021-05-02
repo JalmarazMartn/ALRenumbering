@@ -1,10 +1,4 @@
-//Excluir flowfiels
-//Comienzo fields keys
-//Si ya esta una key todo fuera.
-//Si es extension sin keys
-
 const vscode = require('vscode');
-const TableTypeDef = ['TABLE','TABLEXTENSION'];
 const carriage = '\r\n';
 module.exports = {
 	ProcessWorkSpace: function (RenumberJSON = []) {
@@ -14,22 +8,20 @@ module.exports = {
 	) {
 		return GetWorkspaceObjects();
 	},
-	RenumberObjects : function () 
-	{
-			ProcessRenumFile(ProcessWorkSpace);
-		},
-	CreateNewCSVFile: function(){
+	RenumberObjects: function () {
+		ProcessRenumFile(ProcessWorkSpace);
+	},
+	CreateNewCSVFile: function () {
 		let EmptyRenumberJSON = [];
 		CreateCSVFile(EmptyRenumberJSON);
 	},
-UpdatePreviousCSVFile: function(){
-	ProcessRenumFile(CreateCSVFile);
-},
-CreateTableObjectsWithoutLogic: function ()
-{
-	CreateTableObjectsWithoutLogic();
-}	
+	UpdatePreviousCSVFile: function () {
+		ProcessRenumFile(CreateCSVFile);
+	},
+	GetCurrentObject: function (FirstLine = '') {
+		return GetCurrentObject(FirstLine);
 	}
+}
 
 async function ProcessWorkSpace(RenumberJSON = []) {
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
@@ -140,8 +132,7 @@ async function ProcessRenumFile(EndProccesingFuntcion) {
 	});
 	rd.on('close', EndProccesingFuntcion(RenumberJSON));
 }
-async function CreateCSVFile(RenumberJSON)
-{
+async function CreateCSVFile(RenumberJSON) {
 	const sep = ';';
 
 	var WorkspaceObjects = await GetWorkspaceObjects();
@@ -152,101 +143,20 @@ async function CreateCSVFile(RenumberJSON)
 		filters: {
 			'csv': ['csv'],
 		}
-	};	
-	let fileUri = await vscode.window.showSaveDialog(options);	
-	var LineText = 'ObjectType' +sep + 'OldId' +sep + 'Name'+sep + 'NewId'+ carriage;
+	};
+	let fileUri = await vscode.window.showSaveDialog(options);
+	var LineText = 'ObjectType' + sep + 'OldId' + sep + 'Name' + sep + 'NewId' + carriage;
 	let NewId = '';
 	let DeclarationText = '';
 	for (let index = 0; index < WorkspaceObjects.length; index++) {
-		if (RenumberJSON)
-		{
+		if (RenumberJSON) {
 			DeclarationText = WorkspaceObjects[index].ObjectType + ' ' + WorkspaceObjects[index].ObjectID +
-			 ' ' + WorkspaceObjects[index].ObjectName;
-			NewId = FindNumberRelation(DeclarationText,RenumberJSON).NewID;
+				' ' + WorkspaceObjects[index].ObjectName;
+			NewId = FindNumberRelation(DeclarationText, RenumberJSON).NewID;
 		}
-		LineText = LineText + WorkspaceObjects[index].ObjectType +sep + WorkspaceObjects[index].ObjectID +sep + 
-				WorkspaceObjects[index].ObjectName+sep+NewId+carriage;		
-	}	
-	await vscode.workspace.fs.writeFile(fileUri,Buffer.from(LineText));
+		LineText = LineText + WorkspaceObjects[index].ObjectType + sep + WorkspaceObjects[index].ObjectID + sep +
+			WorkspaceObjects[index].ObjectName + sep + NewId + carriage;
+	}
+	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
-}
-async function CreateTableObjectsWithoutLogic()
-{
-	const FolderName = await SelectFolder();
-	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
-	for (let index = 0; index < AllDocs.length; index++) {
-		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const FirstLine = ALDocument.lineAt(0).text;
-		if (IsTableObject(FirstLine))
-		{
-			WriteFileWithOutCode(ALDocument,FolderName[0].fsPath);
-		}
-	}
-}
-async function SelectFolder()
-{
-    const options = {
-        canSelectMany: false,
-        openLabel: 'Select target folder',
-        canSelectFiles: false,
-        canSelectFolders: true
-    };
-	return await vscode.window.showOpenDialog(options);
-}
-function IsTableObject(FirstLine='')
-{
-	let CurrentObject = GetCurrentObject(FirstLine);
-	if (!CurrentObject)
-	{
-		return false;
-	}
-	if (TableTypeDef.indexOf(CurrentObject.ObjectType.toUpperCase()) > -1)
-	{
-		return true;
-	}
-}
-async function WriteFileWithOutCode(ALDocument,FolderName='')
-{
-	let FinalText = '';
-	let CurrElement = { ElementText: "", ElementOpenLine: 0};
-	for (let index = 0; index < ALDocument.lineCount-1 ; index++) {
-		if ((index == 0))
-		{
-			FinalText = FinalText + ALDocument.lineAt(index).text + carriage;
-		}
-		if (MatchWithElement(ALDocument.lineAt(index).text)) {
-			CurrElement.ElementText = ALDocument.lineAt(index).text;
-			CurrElement.ElementOpenLine = index;
-		}
-		else {
-			if (CurrElement.ElementText !== '') {
-				CurrElement.ElementText = CurrElement.ElementText + ALDocument.lineAt(index).text;
-			}
-		}
-		if (MatchWithClose(ALDocument.lineAt(index).text)) {
-			if (CurrElement.ElementText != '')
-			{
-			for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index ; ElemNumber++) {
-				FinalText = FinalText + ALDocument.lineAt(ElemNumber).text + carriage;
-			}
-		}
-			CurrElement.ElementText = '';
-			CurrElement.ElementOpenLine = 0;
-		}		
-	}	
-
-	const OnlyName = ALDocument.uri.path.replace(/^.*[\\\/]/, '')
-	const fileUri = vscode.Uri.file(FolderName+'/'+OnlyName);
-	await vscode.workspace.fs.writeFile(fileUri,Buffer.from(FinalText));
-}
-function MatchWithElement(lineText = '') {
-		var ElementMatch = lineText.match(/\s*field\s*\(.*\)/gi);
-		if (!ElementMatch) { 
-			ElementMatch = lineText.match(/\s*key\s*\(.*\)/gi);        
-		}
-		if (ElementMatch) { return (true); }
-		return (false);
-	}
-function MatchWithClose(lineText = '') {
-    return (lineText.indexOf('}') >= 0);
 }

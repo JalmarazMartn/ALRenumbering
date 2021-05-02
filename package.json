@@ -3,7 +3,7 @@
 	"displayName": "JAM AL Renumbering Tool",
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"icon": "images/Tipsa.png",	
 	"repository": "{https://github.com/JalmarazMartn/ALRenumbering}",
 	"engines": {
