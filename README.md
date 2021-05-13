@@ -26,6 +26,16 @@ Command will ask the source CSV file with the renumbering and execute renumberin
 
 New command "JAM Update previous CSV Renumbering file with new objects in workspace", merge an existing CSV objects with set renumbering with new objects in workspace. The steps are: F1 "JAM Update previous CSV Renumbering file with new objects in workspace", select previous CSV file and then select target new merged file. They can be the same.
 
+## New empty table objects generation command.
+
+Sometimes in upgrading processes we need a copy of app tables and tableextensions, but logic, only fields and primary key, no procedures, triggers, and no other properties. You can generate these empty tables in a target directory, executing this command in the original app workspace: "JAM Generate empty logic table objects in target folder"
+
+![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EmptyObj.gif?raw=true)
+
+If you open the target workspace you could see the new empty tables only with the fields:
+
+![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EmptyObj.png?raw=true)
+
 
 ## Requirements
 
@@ -41,6 +51,10 @@ Not yet.
 
 ## Release Notes
 
-### 1.0.0
+### 0.0.1
 
 Initial release.
+
+### 0.0.2
+
+New empty table objects generation command.
