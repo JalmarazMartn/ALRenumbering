@@ -62,7 +62,7 @@ function FindNumberRelation(FirstLine, RenumberJSON) {
 	}
 	return NumberRelation;
 }
-function GetCurrentObject(FirstLine = '') {
+function GetCurrentObject(FirstLine = '') {	
 	var CurrentObject =
 	{
 		ObjectType: '',
@@ -70,7 +70,7 @@ function GetCurrentObject(FirstLine = '') {
 		ObjectName: ''
 	}
 		;
-	var DeclaratioMatch = FirstLine.match(/\s*([a-zA-Z]+)\s*([0-9]+)\s+(.*)/);
+	var DeclaratioMatch = FirstLine.match(/\s*([a-zA-Z]+)\s*([0-9]+)\s+(.*)/i);
 	if (!DeclaratioMatch) {
 		return CurrentObject;
 	}
@@ -78,7 +78,7 @@ function GetCurrentObject(FirstLine = '') {
 	{
 		ObjectType: DeclaratioMatch[1],
 		ObjectID: DeclaratioMatch[2],
-		ObjectName: DeclaratioMatch[3]
+		ObjectName: extendsRemoved(DeclaratioMatch[3])
 	}
 	return CurrentObject;
 }
@@ -159,4 +159,14 @@ async function CreateCSVFile(RenumberJSON) {
 	}
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
-}
+}	
+	function extendsRemoved(OldName='')
+	{
+		var extendsPosition = OldName.search(/\s+extends\s+/i);
+		if (extendsPosition < 0)
+		{
+			return OldName;
+		}
+		return OldName.substring(0,extendsPosition);
+	}
+
