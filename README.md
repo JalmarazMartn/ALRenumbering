@@ -62,3 +62,7 @@ New empty table objects generation command.
 ### 0.0.3
 
 Remove "extends" and extended object from name in csv
+
+### 0.0.4
+
+Repository visibility issue: Thanks dannoe!!
