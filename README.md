@@ -66,3 +66,9 @@ Remove "extends" and extended object from name in csv
 ### 0.0.4
 
 Repository visibility issue: Thanks dannoe!!
+
+### 0.0.5
+
+Issue with tablerelation. When found "TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No.")"
+creates new field this way:
+FIELD("Item No."){}

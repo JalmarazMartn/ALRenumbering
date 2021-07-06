@@ -117,7 +117,7 @@ function GetFinalKeysText(ALDocument)
 	return '';
 }
 function MatchWithFieldDeclaration(lineText = '') {
-	var ElementMatch = lineText.match(/\s*field\s*\(.*\)/i);
+	var ElementMatch = lineText.match(/\s*field\s*\(.*;.*;.*\)/i);
 	if (ElementMatch) {
 		return ElementMatch[0].toString();
 	}
