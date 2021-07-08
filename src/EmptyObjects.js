@@ -55,9 +55,14 @@ function IsTableExtensionObject(FirstLine = '') {
 }
 async function WriteFileWithOutCode(ALDocument, FolderName = '') {
 	let FinalText = '';
+	let FinalFieldsText = GetFinalFieldsText(ALDocument);
 	FinalText = FinalText + ALDocument.lineAt(0).text + carriage;
 	FinalText = FinalText + '{' + carriage;
-	FinalText = FinalText + GetFinalFieldsText(ALDocument) + carriage;
+	FinalText = FinalText + FinalFieldsText + carriage;
+	if (FinalFieldsText == '')
+	{
+		return;
+	}
 	if (!IsTableExtensionObject(ALDocument.lineAt(0).text))
 	{
 		FinalText = FinalText + GetFinalKeysText(ALDocument) + carriage;

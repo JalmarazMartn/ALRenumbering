@@ -105,15 +105,7 @@ function SortObjects(a, b) {
 }
 async function ProcessRenumFile(EndProccesingFuntcion) {
 	var RenumberJSON = [];
-	const options = {
-		canSelectMany: false,
-		openLabel: 'Open',
-		title: 'Select CSV File',
-		filters: {
-			'csv': ['csv'],
-		}
-	};
-	let fileUri = await vscode.window.showOpenDialog(options);
+	let fileUri = await vscode.window.showOpenDialog(optionsCSVFile('Open'));
 	var fs = require('fs'),
 		readline = require('readline');
 
@@ -136,15 +128,7 @@ async function CreateCSVFile(RenumberJSON) {
 	const sep = ';';
 
 	var WorkspaceObjects = await GetWorkspaceObjects();
-	const options = {
-		canSelectMany: false,
-		openLabel: 'Save',
-		title: 'Select CSV File',
-		filters: {
-			'csv': ['csv'],
-		}
-	};
-	let fileUri = await vscode.window.showSaveDialog(options);
+	let fileUri = await vscode.window.showSaveDialog(optionsCSVFile('Save'));
 	var LineText = 'ObjectType' + sep + 'OldId' + sep + 'Name' + sep + 'NewId' + carriage;
 	let NewId = '';
 	let DeclarationText = '';
@@ -160,7 +144,7 @@ async function CreateCSVFile(RenumberJSON) {
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
 }	
-	function extendsRemoved(OldName='')
+function extendsRemoved(OldName='')
 	{
 		var extendsPosition = OldName.search(/\s+extends\s+/i);
 		if (extendsPosition < 0)
@@ -169,4 +153,40 @@ async function CreateCSVFile(RenumberJSON) {
 		}
 		return OldName.substring(0,extendsPosition);
 	}
+function optionsCSVFile(newOpenLabel='')
+{
+	const options = {
+		canSelectMany: false,
+		openLabel: newOpenLabel,
+		title: 'Select CSV File',
+		filters: {
+			'csv': ['csv'],
+		}
+	};
+	return options;
+}
+async function CreateCSVTableExtFieldsFile() {
+	const sep = ';';
+	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
+	var FinalText = 'OldId' + sep + 'Name' + sep + 'NewId' + carriage;
+	for (let index = 0; index < AllDocs.length; index++) {
+		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
+		const FirstLine = ALDocument.lineAt(0).text;
+		if ((FirstLine.search(/Tablextension/i) >= 0)) 
+		{
+
+		}
+	}
+}
+async function GetFieldsTextFromTableExtension(ALDocument)
+{
+let fieldsText = '';
+for (let index = 1; index < ALDocument.lineCount - 1; index++) {
+	let matchField = ALDocument.lineAt(index).lineText.match('/field\((.*);(.*);/i');
+	if (matchField)
+	{
+	fieldsText = fieldsText + matchField;
+	}
+	}
+}
 
