@@ -72,3 +72,7 @@ Repository visibility issue: Thanks dannoe!!
 Issue with tablerelation. When found "TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No.")"
 creates new field this way:
 FIELD("Item No."){}
+
+### 0.0.6
+
+Avoid generate empty tableextension file if no fields added.
