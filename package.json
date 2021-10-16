@@ -20,7 +20,8 @@
 		"onCommand:JAMRenumbering.Renumber",
 		"onCommand:JAMRenumbering.CreateCSVFile",
 		"onCommand:JAMRenumbering.UpdatePreviousCSVFile",
-		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogic"
+		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogic",
+		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL"		
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -38,7 +39,10 @@
 			},
 			{"command": "JAMRenumbering.CreateTableObjectsWithoutLogic",
 			"title": "JAM Generate empty logic table objects in target folder"
-			}			
+			},
+			{"command": "JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
+				"title": "JAM Generate empty logic C/AL table objects in target folder"
+				}				
 		]
 	},
 	"scripts": {

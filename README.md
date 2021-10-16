@@ -32,6 +32,8 @@ Sometimes in upgrading processes we need a copy of app tables and tableextension
 
 ![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EmptyObj.gif?raw=true)
 
+You can get Empty table object for C/SIDE previous versions with "JAM Generate empty logic C/AL table objects in target folder" command. This could be useful for upgrade toolkits.
+
 If you open the target workspace you could see the new empty tables only with the fields:
 
 ![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EmptyObj.png?raw=true)
@@ -76,3 +78,7 @@ FIELD("Item No."){}
 ### 0.0.6
 
 Avoid generate empty tableextension file if no fields added.
+
+### 0.0.7
+
+Generate empty table objects in CAL format.

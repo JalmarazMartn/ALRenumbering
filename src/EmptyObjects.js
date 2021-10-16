@@ -5,23 +5,35 @@ const vscode = require('vscode');
 const tableExtensionDec = 'TABLEEXTENSION';
 const tableDec = 'TABLE';
 const carriage = '\r\n';
+const ObjectCaption = 'OBJECT';
 module.exports = {
 	CreateTableObjectsWithoutLogic: function () {
 		CreateTableObjectsWithoutLogic();
+	},
+	CreateTableObjectsWithoutLogicCAL: function () {
+		CreateTableObjectsWithoutLogicCAL();
 	}
 }
 
 async function CreateTableObjectsWithoutLogic() {
+	CreateTableObjectsWithoutLogicGeneric(false);
+}
+async function CreateTableObjectsWithoutLogicCAL() {
+	CreateTableObjectsWithoutLogicGeneric(true);
+}
+async function CreateTableObjectsWithoutLogicGeneric(CSIDE = false) {
 	const FolderName = await SelectFolder();
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const FirstLine = ALDocument.lineAt(0).text;
 		if (IsTableObject(FirstLine)) {
-			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath);
+			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath, CSIDE);
 		}
 	}
 }
+
+
 async function SelectFolder() {
 	const options = {
 		canSelectMany: false,
@@ -53,27 +65,32 @@ function IsTableExtensionObject(FirstLine = '') {
 	}
 	return false;
 }
-async function WriteFileWithOutCode(ALDocument, FolderName = '') {
+async function WriteFileWithOutCode(ALDocument, FolderName = '', CSIDE = false) {
 	let FinalText = '';
 	let FinalFieldsText = GetFinalFieldsText(ALDocument);
 	FinalText = FinalText + ALDocument.lineAt(0).text + carriage;
 	FinalText = FinalText + '{' + carriage;
 	FinalText = FinalText + FinalFieldsText + carriage;
-	if (FinalFieldsText == '')
-	{
+	if (FinalFieldsText == '') {
 		return;
 	}
-	if (!IsTableExtensionObject(ALDocument.lineAt(0).text))
-	{
+	if (!IsTableExtensionObject(ALDocument.lineAt(0).text)) {
 		FinalText = FinalText + GetFinalKeysText(ALDocument) + carriage;
 	}
 	FinalText = FinalText + '}';
-	const OnlyName = ALDocument.uri.path.replace(/^.*[\\\/]/, '')
+	let OnlyName = ALDocument.uri.path.replace(/^.*[\\\/]/, '');
+	if (CSIDE) {
+		if (IsTableExtensionObject(ALDocument.lineAt(0).text))
+		{
+			return;
+		}
+		OnlyName = ReplaceFileExtToTxt(OnlyName);
+		FinalText = ConvertObjectTextToCAL(FinalText);
+	}
 	const fileUri = vscode.Uri.file(FolderName + '/' + 'Empty.' + OnlyName);
-	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));	
+	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
 }
-function GetFinalFieldsText(ALDocument)
-{
+function GetFinalFieldsText(ALDocument) {
 	let FinalText = '';
 	let CurrElement = { ElementText: "", ElementOpenLine: 0 };
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
@@ -84,41 +101,38 @@ function GetFinalFieldsText(ALDocument)
 		else {
 			if (CurrElement.ElementText !== '') {
 				CurrElement.ElementText = CurrElement.ElementText + ALDocument.lineAt(index).text;
-				if (GetIsFlowField(CurrElement.ElementText))
-				{
+				if (GetIsFlowField(CurrElement.ElementText)) {
 					CurrElement.ElementOpenLine = 0;
 					CurrElement.ElementText = '';
 				}
 			}
 		}
-		let WriteElement = (MatchWithClose(ALDocument.lineAt(index).text)) && 
-						(CurrElement.ElementText != '');
+		let WriteElement = (MatchWithClose(ALDocument.lineAt(index).text)) &&
+			(CurrElement.ElementText != '');
 		if (WriteElement) {
-				for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index; ElemNumber++) {
-					if (GetContentToWrite(ALDocument.lineAt(ElemNumber).text))
-						FinalText = FinalText + (GetContentToWrite(ALDocument.lineAt(ElemNumber).text)) + carriage;
-				}
+			for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index; ElemNumber++) {
+				if (GetContentToWrite(ALDocument.lineAt(ElemNumber).text))
+					FinalText = FinalText + (GetContentToWrite(ALDocument.lineAt(ElemNumber).text)) + carriage;
+			}
 			FinalText = FinalText + '}' + carriage;
 			CurrElement.ElementText = '';
 			CurrElement.ElementOpenLine = 0;
 		}
 	}
-	if (FinalText != '')
-	{
+	if (FinalText != '') {
 		FinalText = 'fields' + carriage + '{' + carriage + FinalText + carriage + '}';
 	}
 	return FinalText;
 }
-function GetFinalKeysText(ALDocument)
-{
+function GetFinalKeysText(ALDocument) {
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
 		if (MatchWithKeyDeclaration(ALDocument.lineAt(index).text)) {
 			return 'keys' + carriage + '{' + carriage +
-			MatchWithKeyDeclaration(ALDocument.lineAt(index).text) + carriage + '{}' +
-			carriage + '}';
-			
+				MatchWithKeyDeclaration(ALDocument.lineAt(index).text) + carriage + '{}' +
+				carriage + '}';
+
 		}
-}
+	}
 	return '';
 }
 function MatchWithFieldDeclaration(lineText = '') {
@@ -153,7 +167,32 @@ function GetContentToWrite(lineText = '') {
 		return MatchWithOptionMembers(lineText) + carriage;
 	}
 }
-function GetIsFlowField(ElementText='')
-{
+function GetIsFlowField(ElementText = '') {
 	return (ElementText.search(/FieldClass\s*=\s*(FlowField|FlowFilter)\s*;/i) >= 0)
+}
+function ReplaceFileExtToTxt(OnlyName = '') {
+	return OnlyName.replace('.al', '.txt');
+}
+function ConvertObjectTextToCAL(ObjectText = '') {
+	let ObjectTextCAL = ObjectText.replace(/field\((.*)\;(.*)\;(.*?)\)\s*\{\s*(.*)\s*\}/gmi,ConvertToCALFields);
+	ObjectTextCAL = ObjectTextCAL.replace(/key\(.*?;(.*?)\)/gm,ConvertToCALKey);
+	ObjectTextCAL = ObjectTextCAL.replace(/\{\s*\}/gm,'');
+	ObjectTextCAL = ObjectTextCAL.replace(/"/gm,'');		
+	return (ObjectCaption + ' ' + ObjectTextCAL);
+}
+function ConvertToCALFields(fullMatch,FieldNumber,FieldName,FieldType,FieldProperty)
+{
+	let CALFields = FieldNumber+'; ;'+FieldName+'; '+FieldType.replace(/[\[|\]]/gm,'');
+	if (FieldProperty != '')
+	{
+		CALFields = CALFields +';' + FieldProperty.replace(';','');
+	}
+	CALFields = '{'+ CALFields + '}';	
+	return CALFields;
+}
+function ConvertToCALKey(fullMatch,KeyFields)
+{
+	let CALKey = ' ;' + KeyFields;
+	CALKey = '{'+ CALKey + '}';	
+	return CALKey;
 }

@@ -16,6 +16,7 @@ function activate(context) {
 		Library.CreateNewCSVFile();
 	});
 	context.subscriptions.push(CreateCSVSubs);
+
 	let UpdatePreviousCSVFile = vscode.commands.registerCommand('JAMRenumbering.UpdatePreviousCSVFile', function () {
 		const Library = require('./src/Library.js');		
 		Library.UpdatePreviousCSVFile();
@@ -28,6 +29,12 @@ function activate(context) {
 		EmptyObjects.CreateTableObjectsWithoutLogic();
 	});
 	context.subscriptions.push(CreateTableObjectsWithoutLogic);	
+	let CreateTableObjectsWithoutLogicCAL = vscode.commands.registerCommand('JAMRenumbering.CreateTableObjectsWithoutLogicCAL', function () {
+		const EmptyObjects = require('./src/EmptyObjects.js');		
+		EmptyObjects.CreateTableObjectsWithoutLogicCAL();
+	});
+	context.subscriptions.push(CreateTableObjectsWithoutLogicCAL);	
+
 }
 // @ts-ignore
 exports.activate = activate;
