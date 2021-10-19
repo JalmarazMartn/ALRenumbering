@@ -178,6 +178,9 @@ function ConvertObjectTextToCAL(ObjectText = '') {
 	ObjectTextCAL = ObjectTextCAL.replace(/key\(.*?;(.*?)\)/gm,ConvertToCALKey);
 	ObjectTextCAL = ObjectTextCAL.replace(/\{\s*\}/gm,'');
 	ObjectTextCAL = ObjectTextCAL.replace(/"/gm,'');		
+	ObjectTextCAL = ObjectTextCAL.replace(/fields\s*{/gmi,ConvertToUppercase);
+	ObjectTextCAL = ObjectTextCAL.replace(/keys\s*{/gmi,ConvertToUppercase);
+	ObjectTextCAL = ObjectTextCAL.replace(/OptionMembers/gmi,ConvertToOptionCAL);
 	return (ObjectCaption + ' ' + ObjectTextCAL);
 }
 function ConvertToCALFields(fullMatch,FieldNumber,FieldName,FieldType,FieldProperty)
@@ -195,4 +198,12 @@ function ConvertToCALKey(fullMatch,KeyFields)
 	let CALKey = ' ;' + KeyFields;
 	CALKey = '{'+ CALKey + '}';	
 	return CALKey;
+}
+function ConvertToOptionCAL(fullMatch)
+{
+	return 'OptionString';
+}
+function ConvertToUppercase(fullMatch)
+{
+	return fullMatch.toUpperCase();
 }

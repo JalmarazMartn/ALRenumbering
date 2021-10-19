@@ -82,3 +82,7 @@ Avoid generate empty tableextension file if no fields added.
 ### 0.0.7
 
 Generate empty table objects in CAL format. Beta feature, still Testing.
+
+### 0.0.8
+
+Generate empty table objects in CAL format. working.
