@@ -16,23 +16,44 @@ module.exports = {
 }
 
 async function CreateTableObjectsWithoutLogic() {
-	CreateTableObjectsWithoutLogicGeneric(false);
+	CreateTableObjectsWithoutLogicGeneric();
 }
 async function CreateTableObjectsWithoutLogicCAL() {
-	CreateTableObjectsWithoutLogicGeneric(true);
+	CreateTableObjectsWithoutLogicGenericCSIDE();
 }
-async function CreateTableObjectsWithoutLogicGeneric(CSIDE = false) {
+async function CreateTableObjectsWithoutLogicGeneric() {
 	const FolderName = await SelectFolder();
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const FirstLine = ALDocument.lineAt(0).text;
 		if (IsTableObject(FirstLine)) {
-			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath, CSIDE);
+			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath);
 		}
 	}
 }
 
+async function CreateTableObjectsWithoutLogicGenericCSIDE() {
+	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
+	let FinalText = '';
+	for (let index = 0; index < AllDocs.length; index++) {
+		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
+		const FirstLine = ALDocument.lineAt(0).text;
+		if (IsTableObject(FirstLine)) {
+			let ObjectText = GetAllEmptyObjectContent(ALDocument);
+			ObjectText = ConvertObjectTextToCAL(ObjectText);
+			if (IsTableExtensionObject(FirstLine))
+			{
+				ObjectText = '';
+			}
+			if (ObjectText !== '') {
+				ObjectText = carriage + ObjectText;
+			}
+			FinalText = FinalText + ObjectText;
+		}
+	}
+	await vscode.workspace.fs.writeFile(await SelectTextTargetFile(), Buffer.from(FinalText));
+}
 
 async function SelectFolder() {
 	const options = {
@@ -43,6 +64,17 @@ async function SelectFolder() {
 	};
 	return await vscode.window.showOpenDialog(options);
 }
+async function SelectTextTargetFile() {
+	const options = {
+		canSelectMany: false,
+		openLabel: 'Select target new txt CSIDE file',
+		canSelectFiles: true,
+		canSelectFolders: false,
+		filters: {'Txt file': ['txt']}		
+	};
+	return await vscode.window.showSaveDialog(options);
+}
+
 function IsTableObject(FirstLine = '') {
 	let Library = require('./Library')
 	let CurrentObject = Library.GetCurrentObject(FirstLine);
@@ -65,30 +97,29 @@ function IsTableExtensionObject(FirstLine = '') {
 	}
 	return false;
 }
-async function WriteFileWithOutCode(ALDocument, FolderName = '', CSIDE = false) {
+async function WriteFileWithOutCode(ALDocument, FolderName = '') {
+	let FinalText = GetAllEmptyObjectContent(ALDocument);
+	if (FinalText == '') {
+		return;
+	}
+	let OnlyName = ALDocument.uri.path.replace(/^.*[\\\/]/, '');
+	const fileUri = vscode.Uri.file(FolderName + '/' + 'Empty.' + OnlyName);
+	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
+}
+function GetAllEmptyObjectContent(ALDocument) {
 	let FinalText = '';
 	let FinalFieldsText = GetFinalFieldsText(ALDocument);
 	FinalText = FinalText + ALDocument.lineAt(0).text + carriage;
 	FinalText = FinalText + '{' + carriage;
 	FinalText = FinalText + FinalFieldsText + carriage;
 	if (FinalFieldsText == '') {
-		return;
+		return '';
 	}
 	if (!IsTableExtensionObject(ALDocument.lineAt(0).text)) {
 		FinalText = FinalText + GetFinalKeysText(ALDocument) + carriage;
 	}
 	FinalText = FinalText + '}';
-	let OnlyName = ALDocument.uri.path.replace(/^.*[\\\/]/, '');
-	if (CSIDE) {
-		if (IsTableExtensionObject(ALDocument.lineAt(0).text))
-		{
-			return;
-		}
-		OnlyName = ReplaceFileExtToTxt(OnlyName);
-		FinalText = ConvertObjectTextToCAL(FinalText);
-	}
-	const fileUri = vscode.Uri.file(FolderName + '/' + 'Empty.' + OnlyName);
-	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
+	return FinalText;
 }
 function GetFinalFieldsText(ALDocument) {
 	let FinalText = '';
@@ -170,40 +201,32 @@ function GetContentToWrite(lineText = '') {
 function GetIsFlowField(ElementText = '') {
 	return (ElementText.search(/FieldClass\s*=\s*(FlowField|FlowFilter)\s*;/i) >= 0)
 }
-function ReplaceFileExtToTxt(OnlyName = '') {
-	return OnlyName.replace('.al', '.txt');
-}
 function ConvertObjectTextToCAL(ObjectText = '') {
-	let ObjectTextCAL = ObjectText.replace(/field\((.*)\;(.*)\;(.*?)\)\s*\{\s*(.*)\s*\}/gmi,ConvertToCALFields);
-	ObjectTextCAL = ObjectTextCAL.replace(/key\(.*?;(.*?)\)/gm,ConvertToCALKey);
-	ObjectTextCAL = ObjectTextCAL.replace(/\{\s*\}/gm,'');
-	ObjectTextCAL = ObjectTextCAL.replace(/"/gm,'');		
-	ObjectTextCAL = ObjectTextCAL.replace(/fields\s*{/gmi,ConvertToUppercase);
-	ObjectTextCAL = ObjectTextCAL.replace(/keys\s*{/gmi,ConvertToUppercase);
-	ObjectTextCAL = ObjectTextCAL.replace(/OptionMembers/gmi,ConvertToOptionCAL);
+	let ObjectTextCAL = ObjectText.replace(/field\((.*)\;(.*)\;(.*?)\)\s*\{\s*(.*)\s*\}/gmi, ConvertToCALFields);
+	ObjectTextCAL = ObjectTextCAL.replace(/key\(.*?;(.*?)\)/gm, ConvertToCALKey);
+	ObjectTextCAL = ObjectTextCAL.replace(/\{\s*\}/gm, '');
+	ObjectTextCAL = ObjectTextCAL.replace(/"/gm, '');
+	ObjectTextCAL = ObjectTextCAL.replace(/fields\s*{/gmi, ConvertToUppercase);
+	ObjectTextCAL = ObjectTextCAL.replace(/keys\s*{/gmi, ConvertToUppercase);
+	ObjectTextCAL = ObjectTextCAL.replace(/OptionMembers/gmi, ConvertToOptionCAL);
 	return (ObjectCaption + ' ' + ObjectTextCAL);
 }
-function ConvertToCALFields(fullMatch,FieldNumber,FieldName,FieldType,FieldProperty)
-{
-	let CALFields = FieldNumber+'; ;'+FieldName+'; '+FieldType.replace(/[\[|\]]/gm,'');
-	if (FieldProperty != '')
-	{
-		CALFields = CALFields +';' + FieldProperty.replace(';','');
+function ConvertToCALFields(fullMatch, FieldNumber, FieldName, FieldType, FieldProperty) {
+	let CALFields = FieldNumber + '; ;' + FieldName + '; ' + FieldType.replace(/[\[|\]]/gm, '');
+	if (FieldProperty != '') {
+		CALFields = CALFields + ';' + FieldProperty.replace(';', '');
 	}
-	CALFields = '{'+ CALFields + '}';	
+	CALFields = '{' + CALFields + '}';
 	return CALFields;
 }
-function ConvertToCALKey(fullMatch,KeyFields)
-{
+function ConvertToCALKey(fullMatch, KeyFields) {
 	let CALKey = ' ;' + KeyFields;
-	CALKey = '{'+ CALKey + '}';	
+	CALKey = '{' + CALKey + '}';
 	return CALKey;
 }
-function ConvertToOptionCAL(fullMatch)
-{
+function ConvertToOptionCAL(fullMatch) {
 	return 'OptionString';
 }
-function ConvertToUppercase(fullMatch)
-{
+function ConvertToUppercase(fullMatch) {
 	return fullMatch.toUpperCase();
 }

@@ -32,7 +32,7 @@ Sometimes in upgrading processes we need a copy of app tables and tableextension
 
 ![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EmptyObj.gif?raw=true)
 
-You can get Empty table object for C/SIDE previous versions with "JAM Generate empty logic C/AL table objects in target folder" command. This could be useful for upgrade toolkits.
+You can get Empty table object for C/SIDE previous versions with "JAM Generate empty logic C/AL table objects in target single txt file" command. Instead a folder for a set of object files, you must select a single txt target file to save all objects. This could be useful for upgrade toolkits.
 
 If you open the target workspace you could see the new empty tables only with the fields:
 
@@ -86,3 +86,7 @@ Generate empty table objects in CAL format. Beta feature, still Testing.
 ### 0.0.8
 
 Generate empty table objects in CAL format. working.
+
+### 0.0.9
+
+Generate empty table objects in CAL format. All the objects in a single txt file, instead multiple files.

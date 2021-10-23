@@ -3,7 +3,7 @@
 	"displayName": "JAM AL Renumbering Tool",
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"icon": "images/Tipsa.png",	
 	"repository": "https://github.com/JalmarazMartn/ALRenumbering",
 	"engines": {
@@ -41,7 +41,7 @@
 			"title": "JAM Generate empty logic table objects in target folder"
 			},
 			{"command": "JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
-				"title": "JAM Generate empty logic C/AL table objects in target folder"
+				"title": "JAM Generate empty logic C/AL table objects in target single txt file"
 				}				
 		]
 	},
