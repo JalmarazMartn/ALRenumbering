@@ -36,7 +36,7 @@ async function ProcessOldCSIDEFile(fieldsToAdd) {
 		const tableName = getTableNameFromDeclaration(line);
 		TargetFileText = TargetFileText + carriage + line;
 		if (tableName !== '') {
-			fieldText = GetExtendedFieldsFromTableName(tableName);
+			fieldText = GetExtendedFieldsFromTableName(tableName,fieldsToAdd);
 		}
 		console.log(line);
 		const writeFields = (lastLineRetrieved.search(/FIELDS/mi) >= 0) && (line.search(/\{/) >= 0) && (fieldText !== '');
