@@ -8,18 +8,13 @@ const carriage = '\r\n';
 const ObjectCaption = 'OBJECT';
 module.exports = {
 	CreateTableObjectsWithoutLogic: function () {
-		CreateTableObjectsWithoutLogic();
+		CreateTableObjectsWithoutLogicGeneric();
 	},
 	CreateTableObjectsWithoutLogicCAL: function () {
-		CreateTableObjectsWithoutLogicCAL();
-	}
-}
-
-async function CreateTableObjectsWithoutLogic() {
-	CreateTableObjectsWithoutLogicGeneric();
-}
-async function CreateTableObjectsWithoutLogicCAL() {
-	CreateTableObjectsWithoutLogicGenericCSIDE();
+		CreateTableObjectsWithoutLogicGenericCSIDE();
+	},
+	IsTableExtensionObject: function (FirstLine = '') { return IsTableExtensionObject(FirstLine) },
+	GetFinalFieldsText: function(ALDocument){return GetFinalFieldsText(ALDocument)}
 }
 async function CreateTableObjectsWithoutLogicGeneric() {
 	const FolderName = await SelectFolder();
@@ -42,8 +37,7 @@ async function CreateTableObjectsWithoutLogicGenericCSIDE() {
 		if (IsTableObject(FirstLine)) {
 			let ObjectText = GetAllEmptyObjectContent(ALDocument);
 			ObjectText = ConvertObjectTextToCAL(ObjectText);
-			if (IsTableExtensionObject(FirstLine))
-			{
+			if (IsTableExtensionObject(FirstLine)) {
 				ObjectText = '';
 			}
 			if (ObjectText !== '') {
@@ -70,7 +64,7 @@ async function SelectTextTargetFile() {
 		openLabel: 'Select target new txt CSIDE file',
 		canSelectFiles: true,
 		canSelectFolders: false,
-		filters: {'Txt file': ['txt']}		
+		filters: { 'Txt file': ['txt'] }
 	};
 	return await vscode.window.showSaveDialog(options);
 }

@@ -4,7 +4,7 @@
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
 	"version": "0.0.9",
-	"icon": "images/Tipsa.png",	
+	"icon": "images/Tipsa.png",
 	"repository": "https://github.com/JalmarazMartn/ALRenumbering",
 	"engines": {
 		"vscode": "^1.53.0"
@@ -21,7 +21,8 @@
 		"onCommand:JAMRenumbering.CreateCSVFile",
 		"onCommand:JAMRenumbering.UpdatePreviousCSVFile",
 		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogic",
-		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL"		
+		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
+		"onCommand:JAMRenumbering.InsertExtensionFieldsInCSIDEFile"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -34,15 +35,22 @@
 				"command": "JAMRenumbering.CreateCSVFile",
 				"title": "JAM Create Initial CSV ready for fill new ids"
 			},
-			{"command": "JAMRenumbering.UpdatePreviousCSVFile",
-			"title": "JAM Update previous CSV Renumbering file with new objects in workspace"
+			{
+				"command": "JAMRenumbering.UpdatePreviousCSVFile",
+				"title": "JAM Update previous CSV Renumbering file with new objects in workspace"
 			},
-			{"command": "JAMRenumbering.CreateTableObjectsWithoutLogic",
-			"title": "JAM Generate empty logic table objects in target folder"
+			{
+				"command": "JAMRenumbering.CreateTableObjectsWithoutLogic",
+				"title": "JAM Generate empty logic table objects in target folder"
 			},
-			{"command": "JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
+			{
+				"command": "JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
 				"title": "JAM Generate empty logic C/AL table objects in target single txt file"
-				}				
+			},
+			{
+				"command": "JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
+				"title": "JAM Insert extension fields into old CSIDE table definition text file"
+			}
 		]
 	},
 	"scripts": {

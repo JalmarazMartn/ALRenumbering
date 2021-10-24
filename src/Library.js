@@ -111,7 +111,6 @@ async function ProcessRenumFile(EndProccesingFuntcion) {
 
 	var rd = readline.createInterface({
 		input: fs.createReadStream(fileUri[0].fsPath)
-
 	});
 	rd.on('line', function (line) {
 		const Elements = line.split(';');

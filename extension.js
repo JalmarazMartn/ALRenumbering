@@ -33,7 +33,13 @@ function activate(context) {
 		const EmptyObjects = require('./src/EmptyObjects.js');		
 		EmptyObjects.CreateTableObjectsWithoutLogicCAL();
 	});
+
 	context.subscriptions.push(CreateTableObjectsWithoutLogicCAL);	
+	let InsertExtensionFieldsInCSIDEFile = vscode.commands.registerCommand('JAMRenumbering.InsertExtensionFieldsInCSIDEFile', function () {
+		const fieldsFromExtension = require('./src/FieldsFromExtension.js');		
+		fieldsFromExtension.InsertExtensionFieldsInCSIDEFile();
+	});
+	context.subscriptions.push(InsertExtensionFieldsInCSIDEFile);	
 
 }
 // @ts-ignore
