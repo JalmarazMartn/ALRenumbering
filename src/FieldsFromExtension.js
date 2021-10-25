@@ -19,8 +19,6 @@ async function InsertExtensionFieldsInCSIDEFile() {
 		return;
 	}
 	ProcessOldCSIDEFile(fieldsToAdd);
-
-
 }
 async function ProcessOldCSIDEFile(fieldsToAdd) {
 	let fileUri = await vscode.window.showOpenDialog(optionsTextOpen('Select old CSIDE file'));
@@ -38,7 +36,6 @@ async function ProcessOldCSIDEFile(fieldsToAdd) {
 		if (tableName !== '') {
 			fieldText = GetExtendedFieldsFromTableName(tableName,fieldsToAdd);
 		}
-		console.log(line);
 		const writeFields = (lastLineRetrieved.search(/FIELDS/mi) >= 0) && (line.search(/\{/) >= 0) && (fieldText !== '');
 		if (writeFields) {
 			TargetFileText = TargetFileText + carriage + fieldText;
@@ -81,7 +78,7 @@ function writeFieldObject(ALDocument, fieldsToAdd) {
 
 function getTableNameFromextensions(FirstLine = '') {
 	const matchTableName = FirstLine.match(/tableextension.+?extends\s*(.*)/mi);
-	return matchTableName[1].toString().replace('"', '');
+	return matchTableName[1].toString().replace(/"/g, '');
 }
 function getTableNameFromDeclaration(FirstLine = '') {
 	const matchTableName = FirstLine.match(/OBJECT Table \d* \s*(.*)\s*/mi);
@@ -90,8 +87,8 @@ function getTableNameFromDeclaration(FirstLine = '') {
 	}
 	return matchTableName[1].toString();
 }
-function GetExtendedFieldsFromTableName(tableName = '', fieldsToAdd) {
-	const fieldToAdd = fieldsToAdd.find(Obj => Obj.tableName == tableName);
+function GetExtendedFieldsFromTableName(CALtableName = '', fieldsToAdd) {
+	const fieldToAdd = fieldsToAdd.find(Obj => Obj.tableName == CALtableName);
 	if (!fieldToAdd) { return '' }
 	return fieldToAdd.fieldDefinition;
 }
