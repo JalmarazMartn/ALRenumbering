@@ -38,6 +38,13 @@ If you open the target workspace you could see the new empty tables only with th
 
 ![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/EmptyObj.png?raw=true)
 
+## Insert extension fields in an old C/SIDE txt table object
+
+Needed for upgrade toolkits (IMO). New command "JAM Insert extension fields into old CSIDE table definition text file" to perform an insertion in a C/SIDE txt object the extension ot the fields of my current extension workspace. Steps:
+
+1. With F1 execute "JAM Insert extension fields into old CSIDE table definition text file".
+2. Select the old txt C/SIDE file with standart table definitios.
+3. Select new txt C/SIDE file to save these standar tables with extension fields inserted.
 
 ## Requirements
 
