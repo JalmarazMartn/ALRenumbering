@@ -14,7 +14,8 @@ module.exports = {
 		CreateTableObjectsWithoutLogicGenericCSIDE();
 	},
 	IsTableExtensionObject: function (FirstLine = '') { return IsTableExtensionObject(FirstLine) },
-	GetFinalFieldsText: function(ALDocument){return GetFinalFieldsText(ALDocument)}
+	GetFieldsText: function (ALDocument) { return GetFieldsText(ALDocument) },
+	ConvertObjectTextToCAL: function (ObjectText) { return ConvertObjectTextToCAL(ObjectText) }
 }
 async function CreateTableObjectsWithoutLogicGeneric() {
 	const FolderName = await SelectFolder();
@@ -116,6 +117,13 @@ function GetAllEmptyObjectContent(ALDocument) {
 	return FinalText;
 }
 function GetFinalFieldsText(ALDocument) {
+	let FinalText = GetFieldsText(ALDocument);
+	if (FinalText != '') {
+		FinalText = 'fields' + carriage + '{' + carriage + FinalText + carriage + '}';
+	}
+	return FinalText;
+}
+function GetFieldsText(ALDocument) {
 	let FinalText = '';
 	let CurrElement = { ElementText: "", ElementOpenLine: 0 };
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
@@ -143,9 +151,6 @@ function GetFinalFieldsText(ALDocument) {
 			CurrElement.ElementText = '';
 			CurrElement.ElementOpenLine = 0;
 		}
-	}
-	if (FinalText != '') {
-		FinalText = 'fields' + carriage + '{' + carriage + FinalText + carriage + '}';
 	}
 	return FinalText;
 }

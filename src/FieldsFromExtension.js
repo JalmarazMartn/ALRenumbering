@@ -64,10 +64,11 @@ function writeFieldObject(ALDocument, fieldsToAdd) {
 	const FirstLine = ALDocument.lineAt(0).text;
 	const EmptyObjects = require('./EmptyObjects.js')
 	if (!EmptyObjects.IsTableExtensionObject(FirstLine)) { return }
-	const fieldText = EmptyObjects.GetFinalFieldsText(ALDocument);
+	let fieldText = EmptyObjects.GetFieldsText(ALDocument);
 	if (fieldText == '') {
 		return;
 	}
+	fieldText = EmptyObjects.ConvertObjectTextToCAL(fieldText).replace(/OBJECT/,' ');
 	fieldsToAdd.push(
 		{
 			"tableName": getTableNameFromextensions(FirstLine),
