@@ -97,3 +97,7 @@ Generate empty table objects in CAL format. working.
 ### 0.0.9
 
 Generate empty table objects in CAL format. All the objects in a single txt file, instead multiple files.
+
+### 0.1.0
+
+Insert extension fields in an old C/SIDE txt table object with command "JAM Insert extension fields into old CSIDE table definition text file"
