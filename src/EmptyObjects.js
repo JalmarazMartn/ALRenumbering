@@ -72,7 +72,7 @@ async function SelectTextTargetFile() {
 
 function IsTableObject(FirstLine = '') {
 	let Library = require('./Library')
-	let CurrentObject = Library.GetCurrentObject(FirstLine);
+	let CurrentObject = Library.GetCurrentObjectFromLineText(FirstLine);
 	if (!CurrentObject) {
 		return false;
 	}
@@ -83,7 +83,7 @@ function IsTableObject(FirstLine = '') {
 }
 function IsTableExtensionObject(FirstLine = '') {
 	let Library = require('./Library')
-	let CurrentObject = Library.GetCurrentObject(FirstLine);
+	let CurrentObject = Library.GetCurrentObjectFromLineText(FirstLine);
 	if (!CurrentObject) {
 		return false;
 	}

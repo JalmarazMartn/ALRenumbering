@@ -19,8 +19,8 @@ module.exports = {
 	UpdatePreviousCSVFile: function () {
 		ProcessRenumFile(CreateCSVFile);
 	},
-	GetCurrentObject: function (FirstLine = '') {
-		return GetCurrentObject(FirstLine);
+	GetCurrentObjectFromLineText: function (DeclarationLineText = '') {
+		return GetCurrentObjectFromLineText(DeclarationLineText);
 	}
 }
 
@@ -29,14 +29,14 @@ async function ProcessWorkSpace(RenumberJSON = []) {
 	AllDocs.forEach(ALDocumentURI => {
 		vscode.workspace.openTextDocument(ALDocumentURI).then(
 			ALDocument => {
-				const FirstLine = ALDocument.lineAt(0).text;
-				var NumberRelation = FindNumberRelation(FirstLine, RenumberJSON);
+				const DeclarationLineText = ALDocument.lineAt(0).text;
+				var NumberRelation = FindNumberRelation(DeclarationLineText, RenumberJSON);
 				if (NumberRelation) {
 					if ((NumberRelation.NewID != '') && (NumberRelation.NewID != NumberRelation.OldID)) {
-						const LineReplaced = FirstLine.replace(NumberRelation.OldID, NumberRelation.NewID);
+						const LineReplaced = DeclarationLineText.replace(NumberRelation.OldID, NumberRelation.NewID);
 						const WSEdit = new vscode.WorkspaceEdit;
 						const PositionOpen = new vscode.Position(0, 0);
-						const PostionEnd = new vscode.Position(0, FirstLine.length);
+						const PostionEnd = new vscode.Position(0, DeclarationLineText.length);
 						WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
 							LineReplaced);
 						vscode.workspace.applyEdit(WSEdit);
@@ -45,12 +45,12 @@ async function ProcessWorkSpace(RenumberJSON = []) {
 			});
 	});
 }
-function FindNumberRelation(FirstLine, RenumberJSON) {
+function FindNumberRelation(DeclarationLineText, RenumberJSON) {
 	var NumberRelation = {
 		OldID: '',
 		NewID: ''
 	};
-	const CurrentObject = GetCurrentObject(FirstLine);
+	const CurrentObject = GetCurrentObjectFromLineText(DeclarationLineText);
 	if (!CurrentObject) {
 		return NumberRelation;
 	}
@@ -63,7 +63,7 @@ function FindNumberRelation(FirstLine, RenumberJSON) {
 	}
 	return NumberRelation;
 }
-function GetCurrentObject(FirstLine = '') {	
+function GetCurrentObjectFromLineText(DeclarationLineText = '') {	
 	var CurrentObject =
 	{
 		ObjectType: '',
@@ -71,7 +71,7 @@ function GetCurrentObject(FirstLine = '') {
 		ObjectName: ''
 	}
 		;
-	var DeclaratioMatch = FirstLine.match(declarationRegExp);
+	var DeclaratioMatch = DeclarationLineText.match(declarationRegExp);
 	if (!DeclaratioMatch) {
 		return CurrentObject;
 	}
@@ -87,9 +87,8 @@ async function GetWorkspaceObjects() {
 	var WorkspaceObjects = [];
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
-		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const FirstLine = ALDocument.lineAt(0).text;
-		var CurrentObject = GetCurrentObject(FirstLine);
+		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])		
+		var CurrentObject = GetCurrentObjectFromDocument(ALDocument);
 		if (CurrentObject.ObjectID !== '') {
 			WorkspaceObjects.push(CurrentObject);
 		}
@@ -171,8 +170,8 @@ async function CreateCSVTableExtFieldsFile() {
 	var FinalText = 'OldId' + sep + 'Name' + sep + 'NewId' + carriage;
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const FirstLine = ALDocument.lineAt(0).text;
-		if ((FirstLine.search(/Tablextension/i) >= 0)) 
+		const DeclarationLineText = ALDocument.lineAt(0).text;
+		if ((DeclarationLineText.search(/Tablextension/i) >= 0)) 
 		{
 
 		}
@@ -182,7 +181,7 @@ async function GetFieldsTextFromTableExtension(ALDocument)
 {
 let fieldsText = '';
 for (let index = 1; index < ALDocument.lineCount - 1; index++) {
-	let matchField = ALDocument.lineAt(index).lineText.match('/field\((.*);(.*);/i');
+	let matchField = ALDocument.lineAt(index).text.match('/field\((.*);(.*);/i');
 	if (matchField)
 	{
 	fieldsText = fieldsText + matchField;
@@ -193,11 +192,17 @@ function GetDeclarationLineLext(ALDocument)
 {
 	let DeclarationLineLext = '';
 	for (let index = 0; index < ALDocument.lineCount; index++) {
-		let matchDeclaration = ALDocument.lineAt(index).lineText.match(declarationRegExp);
+		let matchDeclaration = ALDocument.lineAt(index).text.match(declarationRegExp);
 		if (matchDeclaration)
 		{
-			DeclarationLineLext = ALDocument.lineAt(index).lineText;
+			DeclarationLineLext = ALDocument.lineAt(index).text;
 		}
 	}
 	return DeclarationLineLext;
+}
+function GetCurrentObjectFromDocument(ALDocument)
+{
+	let DeclarationLineLext = GetDeclarationLineLext(ALDocument);
+	let ObjectDeclaration = GetCurrentObjectFromLineText(DeclarationLineLext);
+	return ObjectDeclaration;
 }
