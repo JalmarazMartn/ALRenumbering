@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const carriage = '\r\n';
+const declarationRegExp = /\s*([a-zA-Z]+)\s*([0-9]+)\s+(.*)/i;
 module.exports = {
 	ProcessWorkSpace: function (RenumberJSON = []) {
 		ProcessWorkSpace(RenumberJSON);
@@ -70,7 +71,7 @@ function GetCurrentObject(FirstLine = '') {
 		ObjectName: ''
 	}
 		;
-	var DeclaratioMatch = FirstLine.match(/\s*([a-zA-Z]+)\s*([0-9]+)\s+(.*)/i);
+	var DeclaratioMatch = FirstLine.match(declarationRegExp);
 	if (!DeclaratioMatch) {
 		return CurrentObject;
 	}
@@ -188,4 +189,15 @@ for (let index = 1; index < ALDocument.lineCount - 1; index++) {
 	}
 	}
 }
-
+function GetDeclarationLineLext(ALDocument)
+{
+	let DeclarationLineLext = '';
+	for (let index = 0; index < ALDocument.lineCount; index++) {
+		let matchDeclaration = ALDocument.lineAt(index).lineText.match(declarationRegExp);
+		if (matchDeclaration)
+		{
+			DeclarationLineLext = ALDocument.lineAt(index).lineText;
+		}
+	}
+	return DeclarationLineLext;
+}
