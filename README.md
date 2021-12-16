@@ -101,3 +101,7 @@ Generate empty table objects in CAL format. All the objects in a single txt file
 ### 0.1.0
 
 Insert extension fields in an old C/SIDE txt table object with command "JAM Insert extension fields into old CSIDE table definition text file"
+
+### 0.1.1
+
+Issue with object declaration search. Previously, we asume the first line was the object declaration, but now we search for the object declaration in the whole file.

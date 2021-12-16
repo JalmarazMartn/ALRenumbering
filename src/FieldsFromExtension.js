@@ -61,9 +61,10 @@ function optionsTextOpen(newOpenLabel = '') {
 }
 
 function writeFieldObject(ALDocument, fieldsToAdd) {
-	const FirstLine = ALDocument.lineAt(0).text;
+	let Library = require('./Library');
+	const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 	const EmptyObjects = require('./EmptyObjects.js')
-	if (!EmptyObjects.IsTableExtensionObject(FirstLine)) { return }
+	if (!EmptyObjects.IsTableExtensionObject(DeclarationLineText)) { return }
 	let fieldText = EmptyObjects.GetFieldsText(ALDocument);
 	if (fieldText == '') {
 		return;
@@ -71,18 +72,18 @@ function writeFieldObject(ALDocument, fieldsToAdd) {
 	fieldText = EmptyObjects.ConvertObjectTextToCAL(fieldText).replace(/OBJECT/,' ');
 	fieldsToAdd.push(
 		{
-			"tableName": getTableNameFromextensions(FirstLine),
+			"tableName": getTableNameFromextensions(DeclarationLineText),
 			"fieldDefinition": fieldText
 		});
 
 }
 
-function getTableNameFromextensions(FirstLine = '') {
-	const matchTableName = FirstLine.match(/tableextension.+?extends\s*(.*)/mi);
+function getTableNameFromextensions(DeclarationLineText = '') {
+	const matchTableName = DeclarationLineText.match(/tableextension.+?extends\s*(.*)/mi);
 	return matchTableName[1].toString().replace(/"/g, '');
 }
-function getTableNameFromDeclaration(FirstLine = '') {
-	const matchTableName = FirstLine.match(/OBJECT Table \d* \s*(.*)\s*/mi);
+function getTableNameFromDeclaration(DeclarationLineText = '') {
+	const matchTableName = DeclarationLineText.match(/OBJECT Table \d* \s*(.*)\s*/mi);
 	if (!matchTableName) {
 		return '';
 	}

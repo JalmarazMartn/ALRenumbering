@@ -13,7 +13,7 @@ module.exports = {
 	CreateTableObjectsWithoutLogicCAL: function () {
 		CreateTableObjectsWithoutLogicGenericCSIDE();
 	},
-	IsTableExtensionObject: function (FirstLine = '') { return IsTableExtensionObject(FirstLine) },
+	IsTableExtensionObject: function (DeclarationLineText = '') { return IsTableExtensionObject(DeclarationLineText) },
 	GetFieldsText: function (ALDocument) { return GetFieldsText(ALDocument) },
 	ConvertObjectTextToCAL: function (ObjectText) { return ConvertObjectTextToCAL(ObjectText) }
 }
@@ -22,8 +22,9 @@ async function CreateTableObjectsWithoutLogicGeneric() {
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const FirstLine = ALDocument.lineAt(0).text;
-		if (IsTableObject(FirstLine)) {
+		const Library = require('./Library');
+		const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
+		if (IsTableObject(DeclarationLineText)) {
 			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath);
 		}
 	}
@@ -34,11 +35,11 @@ async function CreateTableObjectsWithoutLogicGenericCSIDE() {
 	let FinalText = '';
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const FirstLine = ALDocument.lineAt(0).text;
-		if (IsTableObject(FirstLine)) {
+		const DeclarationLineText = ALDocument.lineAt(0).text;
+		if (IsTableObject(DeclarationLineText)) {
 			let ObjectText = GetAllEmptyObjectContent(ALDocument);
 			ObjectText = ConvertObjectTextToCAL(ObjectText);
-			if (IsTableExtensionObject(FirstLine)) {
+			if (IsTableExtensionObject(DeclarationLineText)) {
 				ObjectText = '';
 			}
 			if (ObjectText !== '') {
@@ -70,20 +71,20 @@ async function SelectTextTargetFile() {
 	return await vscode.window.showSaveDialog(options);
 }
 
-function IsTableObject(FirstLine = '') {
+function IsTableObject(DeclarationLineText = '') {
 	let Library = require('./Library')
-	let CurrentObject = Library.GetCurrentObjectFromLineText(FirstLine);
+	let CurrentObject = Library.GetCurrentObjectFromLineText(DeclarationLineText);
 	if (!CurrentObject) {
 		return false;
 	}
 	if (CurrentObject.ObjectType.toUpperCase() == tableDec) {
 		return true;
 	}
-	return IsTableExtensionObject(FirstLine);
+	return IsTableExtensionObject(DeclarationLineText);
 }
-function IsTableExtensionObject(FirstLine = '') {
+function IsTableExtensionObject(DeclarationLineText = '') {
 	let Library = require('./Library')
-	let CurrentObject = Library.GetCurrentObjectFromLineText(FirstLine);
+	let CurrentObject = Library.GetCurrentObjectFromLineText(DeclarationLineText);
 	if (!CurrentObject) {
 		return false;
 	}
@@ -104,13 +105,14 @@ async function WriteFileWithOutCode(ALDocument, FolderName = '') {
 function GetAllEmptyObjectContent(ALDocument) {
 	let FinalText = '';
 	let FinalFieldsText = GetFinalFieldsText(ALDocument);
+	let Library = require('./Library');
 	FinalText = FinalText + ALDocument.lineAt(0).text + carriage;
 	FinalText = FinalText + '{' + carriage;
 	FinalText = FinalText + FinalFieldsText + carriage;
 	if (FinalFieldsText == '') {
 		return '';
 	}
-	if (!IsTableExtensionObject(ALDocument.lineAt(0).text)) {
+	if (!IsTableExtensionObject(Library.GetDeclarationLineText(ALDocument))) {
 		FinalText = FinalText + GetFinalKeysText(ALDocument) + carriage;
 	}
 	FinalText = FinalText + '}';

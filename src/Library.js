@@ -21,6 +21,12 @@ module.exports = {
 	},
 	GetCurrentObjectFromLineText: function (DeclarationLineText = '') {
 		return GetCurrentObjectFromLineText(DeclarationLineText);
+	},
+	GetDeclarationLineText: function (ALDocument) {
+		return GetDeclarationLineText(ALDocument);
+	},
+	GetCurrentObjectFromDocument: function (ALDocument) {
+		return GetCurrentObjectFromDocument(ALDocument);
 	}
 }
 
@@ -188,7 +194,7 @@ for (let index = 1; index < ALDocument.lineCount - 1; index++) {
 	}
 	}
 }
-function GetDeclarationLineLext(ALDocument)
+function GetDeclarationLineText(ALDocument)
 {
 	let DeclarationLineLext = '';
 	for (let index = 0; index < ALDocument.lineCount; index++) {
@@ -202,7 +208,7 @@ function GetDeclarationLineLext(ALDocument)
 }
 function GetCurrentObjectFromDocument(ALDocument)
 {
-	let DeclarationLineLext = GetDeclarationLineLext(ALDocument);
+	let DeclarationLineLext = GetDeclarationLineText(ALDocument);
 	let ObjectDeclaration = GetCurrentObjectFromLineText(DeclarationLineLext);
 	return ObjectDeclaration;
 }
