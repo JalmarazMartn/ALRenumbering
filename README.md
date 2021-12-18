@@ -46,6 +46,16 @@ Needed for upgrade toolkits (IMO). New command "JAM Insert extension fields into
 2. Select the old txt C/SIDE file with standart table definitios.
 3. Select new txt C/SIDE file to save these standar tables with extension fields inserted.
 
+## Fix Tx2AL issues
+
+New command "JAM Fix Txt2AL issues" to fix Tx2AL issues. Steps:
+1. With F1 execute "JAM Fix Txt2AL issues".
+2. Confirm the pop up message with yes.
+3. Automatically fix the Tx2AL issues: set application area with basic and suite and remove scope internal statements.
+4. Save all changed files with File->Save All.
+
+
+
 ## Requirements
 
 Visual Studio Code and AL language.
@@ -105,3 +115,7 @@ Insert extension fields in an old C/SIDE txt table object with command "JAM Inse
 ### 0.1.1
 
 Issue with object declaration search. Previously, we asume the first line was the object declaration, but now we search for the object declaration in the whole file.
+
+### 0.1.2
+
+Add new command "JAM Fix Txt2AL" to fix the txt2al conversion more common issues: lack of application Area, and remove Scope internal deprecate statements.

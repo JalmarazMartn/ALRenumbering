@@ -35,11 +35,19 @@ function activate(context) {
 	});
 
 	context.subscriptions.push(CreateTableObjectsWithoutLogicCAL);	
+
 	let InsertExtensionFieldsInCSIDEFile = vscode.commands.registerCommand('JAMRenumbering.InsertExtensionFieldsInCSIDEFile', function () {
 		const fieldsFromExtension = require('./src/FieldsFromExtension.js');		
 		fieldsFromExtension.InsertExtensionFieldsInCSIDEFile();
 	});
-	context.subscriptions.push(InsertExtensionFieldsInCSIDEFile);	
+	context.subscriptions.push(InsertExtensionFieldsInCSIDEFile);
+
+	//push command JAMRenumbering.FixTxt2ALIssues
+	let FixTxt2ALIssues = vscode.commands.registerCommand('JAMRenumbering.FixTxt2ALIssues', function () {
+		const AddApplicationArea = require('./src/AddApplicationArea.js');		
+		AddApplicationArea.changeInWorkspace();
+	});
+	context.subscriptions.push(FixTxt2ALIssues);
 
 }
 // @ts-ignore
