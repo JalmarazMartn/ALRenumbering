@@ -54,7 +54,13 @@ New command "JAM Fix Txt2AL issues" to fix Tx2AL issues. Steps:
 3. Automatically fix the Tx2AL issues: set application area with basic and suite and remove scope internal statements.
 4. Save all changed files with File->Save All.
 
+## Avoid implicit REC in page fields
 
+New command "JAM Fix Implicit REC in page fields" to avoid implicit REC in page fields. Steps:
+1. With F1 execute "JAM Fix Implicit REC in page fields".
+2. Confirm the pop up message with yes.
+3. Automatically put .rec in page fields declaration.
+4. Save all changed files with File->Save All.
 
 ## Requirements
 
@@ -119,3 +125,7 @@ Issue with object declaration search. Previously, we asume the first line was th
 ### 0.1.2
 
 Add new command "JAM Fix Txt2AL" to fix the txt2al conversion more common issues: lack of application Area, and remove Scope internal deprecate statements.
+
+### 0.1.3
+
+Add new command "JAM Fix Implicit REC in page fields" to fix the implicit REC in page fields, adding the explicit REC in page fields.

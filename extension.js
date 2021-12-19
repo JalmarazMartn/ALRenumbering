@@ -49,6 +49,11 @@ function activate(context) {
 	});
 	context.subscriptions.push(FixTxt2ALIssues);
 
+	let FixImplicitREC = vscode.commands.registerCommand('JAMRenumbering.FixImplicitREC', function () {
+		const AddApplicationArea = require('./src/AvoidImplicitREC.js');		
+		AddApplicationArea.FieldDeclarationAllWorkspace();
+	});
+	context.subscriptions.push(FixImplicitREC);
 }
 // @ts-ignore
 exports.activate = activate;

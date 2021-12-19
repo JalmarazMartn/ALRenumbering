@@ -33,6 +33,9 @@ module.exports = {
     },
     changeInWorkspace: async function () {
         await WorkSpaceProcess();
+    },
+    IsObjectPage: function (CurrDoc) {
+        return IsObjectPage(CurrDoc);
     }
 }
 async function WorkSpaceProcess() {
@@ -42,6 +45,11 @@ async function WorkSpaceProcess() {
     WSDocs.forEach(ALDocumentURI => {
         vscode.workspace.openTextDocument(ALDocumentURI).then(
             ALDocument => {
+                console.log(GetObjectType(ALDocument));
+                if (GetObjectType(ALDocument) == ObjectType.Page) {
+                const AvoidImplicitREC = require('./AvoidImplicitREC.js');
+                AvoidImplicitREC.FixFieldDeclarationDocument(ALDocument);
+                }
                 DocProcessAppAreaDataClass(ALDocument);
                 replaceExpresionInDoc(ALDocument,"[Scope('Internal')]",'');
             });
@@ -172,4 +180,10 @@ async function replaceExpresionInDoc(CurrDoc, Search, Replace) {
         }
     }
     await vscode.workspace.applyEdit(WSEdit);
+}
+function IsObjectPage(CurrDoc) {
+        if (GetObjectType(CurrDoc) == ObjectType.Page) {
+            return true;
+        }
+    return false;
 }
