@@ -41,7 +41,10 @@ async function ProccessLine(ALDocument, LineNumber) {
         return;
     }
     //if find /;rec./i then return
-    if (lineText.match(/\;\s*rec./i)) {
+    if (WholeMatch[2].match(/\s*rec\./i)) {
+        return;
+    }
+    if (ExistsDotsOutsidePairOfQuotes(WholeMatch[2])) {
         return;
     }
     //get all match text replacing second group with rec. + second group
@@ -51,4 +54,22 @@ async function ProccessLine(ALDocument, LineNumber) {
     const PositionClose = new vscode.Position(LineNumber, lineText.indexOf(WholeMatch[0]) + WholeMatch[0].length);
     WSEdit.replace(ALDocument.uri, new vscode.Range(PositionOpen, PositionClose ), NewValue);
     await vscode.workspace.applyEdit(WSEdit);
+}
+function RemoveAllTextBetweenQuotes(Text) {
+    const BlocksOfTextBetweenRegExp = /(\"[^\"]*\")/g;
+    var NewText = Text;
+    NewText = NewText.replace(BlocksOfTextBetweenRegExp, '');
+    return NewText;
+}
+function ExistsDotsOutsidePairOfQuotes(Text) {
+    var NewText = Text;
+    NewText = RemoveAllTextBetweenQuotes(NewText);
+    var Dots = NewText.match(/\./g);
+    if (Dots === null) {
+        return false;
+    }
+    if (Dots.length % 2 === 0) {
+        return false;
+    }
+    return true;
 }

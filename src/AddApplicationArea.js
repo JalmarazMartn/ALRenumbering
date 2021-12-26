@@ -46,10 +46,10 @@ async function WorkSpaceProcess() {
         vscode.workspace.openTextDocument(ALDocumentURI).then(
             ALDocument => {
                 console.log(GetObjectType(ALDocument));
-                if (GetObjectType(ALDocument) == ObjectType.Page) {
-                const AvoidImplicitREC = require('./AvoidImplicitREC.js');
-                AvoidImplicitREC.FixFieldDeclarationDocument(ALDocument);
-                }
+                //if (GetObjectType(ALDocument) == ObjectType.Page) {
+                //const AvoidImplicitREC = require('./AvoidImplicitREC.js');
+                //AvoidImplicitREC.FixFieldDeclarationDocument(ALDocument);
+                //}
                 DocProcessAppAreaDataClass(ALDocument);
                 replaceExpresionInDoc(ALDocument,"[Scope('Internal')]",'');
             });

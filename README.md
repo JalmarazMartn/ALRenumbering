@@ -46,22 +46,6 @@ Needed for upgrade toolkits (IMO). New command "JAM Insert extension fields into
 2. Select the old txt C/SIDE file with standart table definitios.
 3. Select new txt C/SIDE file to save these standar tables with extension fields inserted.
 
-## Fix Tx2AL issues
-
-New command "JAM Fix Txt2AL issues" to fix Tx2AL issues. Steps:
-1. With F1 execute "JAM Fix Txt2AL issues".
-2. Confirm the pop up message with yes.
-3. Automatically fix the Tx2AL issues: set application area with basic and suite and remove scope internal statements.
-4. Save all changed files with File->Save All.
-
-## Avoid implicit REC in page fields
-
-New command "JAM Fix Implicit REC in page fields" to avoid implicit REC in page fields. Steps:
-1. With F1 execute "JAM Fix Implicit REC in page fields".
-2. Confirm the pop up message with yes.
-3. Automatically put .rec in page fields declaration.
-4. Save all changed files with File->Save All.
-
 ## Requirements
 
 Visual Studio Code and AL language.
@@ -129,3 +113,11 @@ Add new command "JAM Fix Txt2AL" to fix the txt2al conversion more common issues
 ### 0.1.3
 
 Add new command "JAM Fix Implicit REC in page fields" to fix the implicit REC in page fields, adding the explicit REC in page fields.
+
+### 0.1.4
+
+Exclude implicit REC in page fields in Fix Txt2AL command.
+
+### 0.1.5
+
+Remove command "JAM Fix Implicit REC in page fields" and command "JAM Fix Txt2AL". You can get these commands in the "JAM Variable name extension" extension.
