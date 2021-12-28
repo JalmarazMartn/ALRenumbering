@@ -121,3 +121,7 @@ Exclude implicit REC in page fields in Fix Txt2AL command.
 ### 0.1.5
 
 Remove command "JAM Fix Implicit REC in page fields" and command "JAM Fix Txt2AL". You can get these commands in the "JAM Variable name extension" extension.
+
+### 0.1.6
+
+Execute removing of commands announce in the previous version.

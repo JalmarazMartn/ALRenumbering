@@ -3,7 +3,7 @@
 	"displayName": "JAM AL Renumbering Tool",
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"icon": "images/Tipsa.png",
 	"repository": "https://github.com/JalmarazMartn/ALRenumbering",
 	"engines": {
@@ -22,9 +22,7 @@
 		"onCommand:JAMRenumbering.UpdatePreviousCSVFile",
 		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogic",
 		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
-		"onCommand:JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
-		"onCommand:JAMRenumbering.FixTxt2ALIssues",
-		"onCommand:JAMRenumbering.FixImplicitREC"
+		"onCommand:JAMRenumbering.InsertExtensionFieldsInCSIDEFile"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -52,14 +50,6 @@
 			{
 				"command": "JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
 				"title": "JAM Insert extension fields into old CSIDE table definition text file"
-			},
-			{
-				"command": "JAMRenumbering.FixTxt2ALIssues",				 
-				"title": "JAM Fix Txt2AL issues App Area, Scope"
-			},
-			{
-				"command": "JAMRenumbering.FixImplicitREC",				 
-				"title": "JAM Fix Implicit REC in page fields"
 			}
 		]
 	},

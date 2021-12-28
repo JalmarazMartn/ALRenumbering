@@ -42,18 +42,6 @@ function activate(context) {
 	});
 	context.subscriptions.push(InsertExtensionFieldsInCSIDEFile);
 
-	//push command JAMRenumbering.FixTxt2ALIssues
-	let FixTxt2ALIssues = vscode.commands.registerCommand('JAMRenumbering.FixTxt2ALIssues', function () {
-		const AddApplicationArea = require('./src/AddApplicationArea.js');		
-		AddApplicationArea.changeInWorkspace();
-	});
-	context.subscriptions.push(FixTxt2ALIssues);
-
-	let FixImplicitREC = vscode.commands.registerCommand('JAMRenumbering.FixImplicitREC', function () {
-		const AddApplicationArea = require('./src/AvoidImplicitREC.js');		
-		AddApplicationArea.FieldDeclarationAllWorkspace();
-	});
-	context.subscriptions.push(FixImplicitREC);
 }
 // @ts-ignore
 exports.activate = activate;
