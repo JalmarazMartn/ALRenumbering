@@ -125,3 +125,7 @@ Remove command "JAM Fix Implicit REC in page fields" and command "JAM Fix Txt2AL
 ### 0.1.6
 
 Execute removing of commands announce in the previous version.
+
+### 0.1.7
+
+Fixed error in the command "JAM Insert extension fields into old CSIDE table definition text file". Write twice the extension fields in the old txt file in some conditions.

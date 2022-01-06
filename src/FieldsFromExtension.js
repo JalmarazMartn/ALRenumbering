@@ -36,9 +36,11 @@ async function ProcessOldCSIDEFile(fieldsToAdd) {
 		if (tableName !== '') {
 			fieldText = GetExtendedFieldsFromTableName(tableName,fieldsToAdd);
 		}
+		//const writeFields = (lastLineRetrieved.search(/\s+FIELDS(?![^ ])/mi) >= 0) && (line.search(/\{/) >= 0) && (fieldText !== '');
 		const writeFields = (lastLineRetrieved.search(/FIELDS/mi) >= 0) && (line.search(/\{/) >= 0) && (fieldText !== '');
 		if (writeFields) {
 			TargetFileText = TargetFileText + carriage + fieldText;
+			fieldText = '';
 		}
 		lastLineRetrieved = line;		
 	});
