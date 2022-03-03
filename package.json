@@ -3,8 +3,8 @@
 	"displayName": "JAM AL Renumbering Tool",
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
-	"version": "0.1.7",
-	"icon": "images/Tipsa.png",
+	"version": "0.1.8",
+	"icon": "images/Programming-Variable-icon.png",
 	"repository": "https://github.com/JalmarazMartn/ALRenumbering",
 	"engines": {
 		"vscode": "^1.53.0"

@@ -129,3 +129,7 @@ Execute removing of commands announce in the previous version.
 ### 0.1.7
 
 Fixed error in the command "JAM Insert extension fields into old CSIDE table definition text file". Write twice the extension fields in the old txt file in some conditions.
+
+### 0.0.8
+
+Use image free common form https://icons.iconarchive.com/icons/icons8/ios7/512/Programming-Variable-icon.png
