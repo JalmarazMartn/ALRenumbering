@@ -132,4 +132,8 @@ Fixed error in the command "JAM Insert extension fields into old CSIDE table def
 
 ### 0.0.8
 
-Use image free common form https://icons.iconarchive.com/icons/icons8/ios7/512/Programming-Variable-icon.png
+Use image free common from https://icons.iconarchive.com/icons/icons8/ios7/512/Programming-Variable-icon.png
+
+### 0.0.9
+
+Use the image free common from https://publicdomainvectors.org/en/free-clipart/Thumb-up-with-animal-numbers/80824.html
