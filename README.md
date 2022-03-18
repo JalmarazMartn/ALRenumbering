@@ -130,10 +130,14 @@ Execute removing of commands announce in the previous version.
 
 Fixed error in the command "JAM Insert extension fields into old CSIDE table definition text file". Write twice the extension fields in the old txt file in some conditions.
 
-### 0.0.8
+### 0.1.8
 
 Use image free common from https://icons.iconarchive.com/icons/icons8/ios7/512/Programming-Variable-icon.png
 
-### 0.0.9
+### 0.1.9
 
 Use the image free common from https://publicdomainvectors.org/en/free-clipart/Thumb-up-with-animal-numbers/80824.html
+
+### 0.2.0
+
+Error taking the object declaration from the first line. It is now the first line with the object declaration.

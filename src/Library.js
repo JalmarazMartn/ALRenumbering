@@ -202,6 +202,7 @@ function GetDeclarationLineText(ALDocument)
 		if (matchDeclaration)
 		{
 			DeclarationLineLext = ALDocument.lineAt(index).text;
+			return DeclarationLineLext;
 		}
 	}
 	return DeclarationLineLext;
