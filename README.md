@@ -141,3 +141,7 @@ Use the image free common from https://publicdomainvectors.org/en/free-clipart/T
 ### 0.2.0
 
 Error taking the object declaration from the first line. It is now the first line with the object declaration.
+
+### 0.2.1
+
+Fixing some erratic behavior in renumeration related to asynchronous execution. Showing execution log in the output channel.

@@ -36,29 +36,28 @@ async function ProcessWorkSpace(RenumberJSON = []) {
 	OutputChannel.show();
 
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
-	AllDocs.forEach(ALDocumentURI => {		
-		OutputChannel.appendLine('Processing ' + ALDocumentURI.fsPath);
-		vscode.workspace.openTextDocument(ALDocumentURI).then(
-			ALDocument => {
-				const DeclarationLineText = ALDocument.lineAt(0).text;
-				var NumberRelation = FindNumberRelation(DeclarationLineText, RenumberJSON);
-				if (NumberRelation) {
-					if ((NumberRelation.NewID != '') && (NumberRelation.NewID != NumberRelation.OldID)) {
-						const LineReplaced = DeclarationLineText.replace(NumberRelation.OldID, NumberRelation.NewID);
-						const WSEdit = new vscode.WorkspaceEdit;
-						const PositionOpen = new vscode.Position(0, 0);
-						const PostionEnd = new vscode.Position(0, DeclarationLineText.length);
-						WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
-							LineReplaced);
-						vscode.workspace.applyEdit(WSEdit);
-						OutputChannel.appendLine('Replaced ' + DeclarationLineText + ' with ' + LineReplaced);
-					}
-				}
-				else {
-					OutputChannel.appendLine('Object not found in Renumber JSON');
-				}
-			});
-	});
+	for (let index = 0; index < AllDocs.length; index++) {
+		var ALDocumentURI = AllDocs[index];
+		var ALDocument = await vscode.workspace.openTextDocument(ALDocumentURI);
+		var DeclarationLineText = await GetDeclarationLineText(ALDocument);
+		OutputChannel.appendLine('Processing ' + DeclarationLineText);		
+		var NumberRelation = FindNumberRelation(DeclarationLineText, RenumberJSON);
+		if (NumberRelation) {
+			if ((NumberRelation.NewID != '') && (NumberRelation.NewID != NumberRelation.OldID)) {
+				const LineReplaced = DeclarationLineText.replace(NumberRelation.OldID, NumberRelation.NewID);
+				const WSEdit = new vscode.WorkspaceEdit;
+				const PositionOpen = new vscode.Position(0, 0);
+				const PostionEnd = new vscode.Position(0, DeclarationLineText.length);
+				WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
+					LineReplaced);
+				vscode.workspace.applyEdit(WSEdit);
+				OutputChannel.appendLine('Replaced ' + DeclarationLineText + ' with ' + LineReplaced);
+			}
+		}
+		else {
+			OutputChannel.appendLine('Object not found in Renumber JSON');
+		}
+	};
 }
 function FindNumberRelation(DeclarationLineText, RenumberJSON) {
 	var NumberRelation = {
@@ -78,7 +77,7 @@ function FindNumberRelation(DeclarationLineText, RenumberJSON) {
 	}
 	return NumberRelation;
 }
-function GetCurrentObjectFromLineText(DeclarationLineText = '') {	
+function GetCurrentObjectFromLineText(DeclarationLineText = '') {
 	var CurrentObject =
 	{
 		ObjectType: '',
@@ -102,7 +101,7 @@ async function GetWorkspaceObjects() {
 	var WorkspaceObjects = [];
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
-		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])		
+		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		var CurrentObject = GetCurrentObjectFromDocument(ALDocument);
 		if (CurrentObject.ObjectID !== '') {
 			WorkspaceObjects.push(CurrentObject);
@@ -157,18 +156,15 @@ async function CreateCSVFile(RenumberJSON) {
 	}
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
-}	
-function extendsRemoved(OldName='')
-	{
-		var extendsPosition = OldName.search(/\s+extends\s+/i);
-		if (extendsPosition < 0)
-		{
-			return OldName;
-		}
-		return OldName.substring(0,extendsPosition);
+}
+function extendsRemoved(OldName = '') {
+	var extendsPosition = OldName.search(/\s+extends\s+/i);
+	if (extendsPosition < 0) {
+		return OldName;
 	}
-function optionsCSVFile(newOpenLabel='')
-{
+	return OldName.substring(0, extendsPosition);
+}
+function optionsCSVFile(newOpenLabel = '') {
 	const options = {
 		canSelectMany: false,
 		openLabel: newOpenLabel,
@@ -186,38 +182,32 @@ async function CreateCSVTableExtFieldsFile() {
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const DeclarationLineText = ALDocument.lineAt(0).text;
-		if ((DeclarationLineText.search(/Tablextension/i) >= 0)) 
-		{
+		if ((DeclarationLineText.search(/Tablextension/i) >= 0)) {
 
 		}
 	}
 }
-async function GetFieldsTextFromTableExtension(ALDocument)
-{
-let fieldsText = '';
-for (let index = 1; index < ALDocument.lineCount - 1; index++) {
-	let matchField = ALDocument.lineAt(index).text.match('/field\((.*);(.*);/i');
-	if (matchField)
-	{
-	fieldsText = fieldsText + matchField;
-	}
+async function GetFieldsTextFromTableExtension(ALDocument) {
+	let fieldsText = '';
+	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
+		let matchField = ALDocument.lineAt(index).text.match('/field\((.*);(.*);/i');
+		if (matchField) {
+			fieldsText = fieldsText + matchField;
+		}
 	}
 }
-function GetDeclarationLineText(ALDocument)
-{
+function GetDeclarationLineText(ALDocument) {
 	let DeclarationLineLext = '';
 	for (let index = 0; index < ALDocument.lineCount; index++) {
 		let matchDeclaration = ALDocument.lineAt(index).text.match(declarationRegExp);
-		if (matchDeclaration)
-		{
+		if (matchDeclaration) {
 			DeclarationLineLext = ALDocument.lineAt(index).text;
 			return DeclarationLineLext;
 		}
 	}
 	return DeclarationLineLext;
 }
-function GetCurrentObjectFromDocument(ALDocument)
-{
+function GetCurrentObjectFromDocument(ALDocument) {
 	let DeclarationLineLext = GetDeclarationLineText(ALDocument);
 	let ObjectDeclaration = GetCurrentObjectFromLineText(DeclarationLineLext);
 	return ObjectDeclaration;
