@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const carriage = '\r\n';
 const declarationRegExp = /\s*([a-zA-Z]+)\s*([0-9]+)\s+(.*)/i;
+const OutputChannel = vscode.window.createOutputChannel(`Output Channel`);
 module.exports = {
 	ProcessWorkSpace: function (RenumberJSON = []) {
 		ProcessWorkSpace(RenumberJSON);
@@ -31,8 +32,12 @@ module.exports = {
 }
 
 async function ProcessWorkSpace(RenumberJSON = []) {
+	OutputChannel.clear();
+	OutputChannel.show();
+
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
-	AllDocs.forEach(ALDocumentURI => {
+	AllDocs.forEach(ALDocumentURI => {		
+		OutputChannel.appendLine('Processing ' + ALDocumentURI.fsPath);
 		vscode.workspace.openTextDocument(ALDocumentURI).then(
 			ALDocument => {
 				const DeclarationLineText = ALDocument.lineAt(0).text;
@@ -46,7 +51,11 @@ async function ProcessWorkSpace(RenumberJSON = []) {
 						WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
 							LineReplaced);
 						vscode.workspace.applyEdit(WSEdit);
+						OutputChannel.appendLine('Replaced ' + DeclarationLineText + ' with ' + LineReplaced);
 					}
+				}
+				else {
+					OutputChannel.appendLine('Object not found in Renumber JSON');
 				}
 			});
 	});
