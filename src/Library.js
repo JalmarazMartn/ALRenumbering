@@ -175,27 +175,6 @@ function optionsCSVFile(newOpenLabel = '') {
 	};
 	return options;
 }
-async function CreateCSVTableExtFieldsFile() {
-	const sep = ';';
-	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
-	var FinalText = 'OldId' + sep + 'Name' + sep + 'NewId' + carriage;
-	for (let index = 0; index < AllDocs.length; index++) {
-		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const DeclarationLineText = ALDocument.lineAt(0).text;
-		if ((DeclarationLineText.search(/Tablextension/i) >= 0)) {
-
-		}
-	}
-}
-async function GetFieldsTextFromTableExtension(ALDocument) {
-	let fieldsText = '';
-	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
-		let matchField = ALDocument.lineAt(index).text.match('/field\((.*);(.*);/i');
-		if (matchField) {
-			fieldsText = fieldsText + matchField;
-		}
-	}
-}
 function GetDeclarationLineText(ALDocument) {
 	let DeclarationLineLext = '';
 	for (let index = 0; index < ALDocument.lineCount; index++) {

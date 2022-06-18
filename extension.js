@@ -42,6 +42,13 @@ function activate(context) {
 	});
 	context.subscriptions.push(InsertExtensionFieldsInCSIDEFile);
 
+	let CreateCSVTableExtFieldsFile = vscode.commands.registerCommand('JAMRenumbering.CreateCSVTableExtFieldsFile', function () {
+		const fieldsFromExtension = require('./src/renumberFields.js');		
+		fieldsFromExtension.CreateCSVTableExtFieldsFile();
+	});
+	context.subscriptions.push(CreateCSVTableExtFieldsFile);
+
+
 }
 // @ts-ignore
 exports.activate = activate;
