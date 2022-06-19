@@ -23,7 +23,8 @@
 		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogic",
 		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
 		"onCommand:JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
-		"onCommand:JAMRenumbering.CreateCSVTableExtFieldsFile"
+		"onCommand:JAMRenumbering.CreateCSVTableExtFieldsFile",
+		"onCommand:JAMRenumbering.RenumberFields"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -55,6 +56,10 @@
 			{
 				"command": "JAMRenumbering.CreateCSVTableExtFieldsFile",
 				"title": "JAM Create CSV table with extension fields to renumber"
+			},
+			{
+				"command": "JAMRenumbering.RenumberFields",
+				"title": "JAM Apply field extension renumbering from CSV file"
 			}
 		]
 	},

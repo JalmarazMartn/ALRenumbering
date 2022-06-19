@@ -3,11 +3,16 @@ const vscode = require('vscode');
 const Library = require('./Library');
 const carriage = '\r\n';
 const sep = ';';
-//exports CreateCSVTableExtFieldsFile
+//declare all the regexps in module scope
+const regexpTableExtension = /tableextension\s*(\d+).*extends\s*(.*)/i;
+const regexpField = /field\((.*);(.*);/i;
 module.exports = {
     CreateCSVTableExtFieldsFile: function () {
         CreateCSVTableExtFieldsFile();
-    }
+    },
+	ProcessRenumFile: function () {
+		ProcessRenumFile();
+	}
 }
 
 async function CreateCSVTableExtFieldsFile() {
@@ -30,12 +35,12 @@ async function GetFieldsTextFromTableExtension(ALDocument) {
     //
 	let fieldsText = '';
     //get in DeclarationLineText line the number expresion: DeclarationLineText is as "tableextension 50000 miexte"
-    let tableExtDeclaration = DeclarationLineText.match(/tableextension\s*(\d+).*extends\s*(.*)/i);
+    let tableExtDeclaration = DeclarationLineText.match(regexpTableExtension);
 	if (tableExtDeclaration === null) {
 		return '';
 	}	
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {        
-		let matchField = ALDocument.lineAt(index).text.match(/field\((.*);(.*);/i);
+		let matchField = ALDocument.lineAt(index).text.match(regexpField);
 		if (matchField) {			
             fieldsText +=  tableExtDeclaration[1] + sep + tableExtDeclaration[2] + sep +matchField[1] + sep + matchField[2] + sep + carriage;
 		}
@@ -52,4 +57,72 @@ function optionsCSVFile(newOpenLabel = '') {
 		}
 	};
 	return options;
+}
+
+async function ProcessRenumFile() {
+	let RenumberJSON = [];
+	let fileUri = await vscode.window.showOpenDialog(optionsCSVFile('Open'));
+	var fs = require('fs'),
+		readline = require('readline');
+
+	var rd = readline.createInterface({
+		input: fs.createReadStream(fileUri[0].fsPath)
+	});
+	rd.on('line', function (line) {
+		const Elements = line.split(sep);
+		RenumberJSON.push(
+			{
+				"tableextNumber": Elements[0],
+				"FieldID": Elements[2],
+				"NewFieldID": Elements[4]
+			});
+		console.log(RenumberJSON);
+	});
+	rd.on('close',function () {			
+			Renumber(RenumberJSON);	
+	}
+	);
+}
+async function Renumber(RenumberJSON) {
+		const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
+		for (let index = 0; index < AllDocs.length; index++) {
+			var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index]);
+			await RenumberFields(ALDocument, RenumberJSON);
+		}
+		vscode.window.showInformationMessage('Renumbering finished');	
+}
+async function RenumberFields(ALDocument, RenumberJSON) {
+    const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
+	let tableExtDeclaration = DeclarationLineText.match(regexpTableExtension);
+    if ((DeclarationLineText.search(/tableextension/i) < 0)) {
+        return;
+    }
+
+	for (let index = 1; index < ALDocument.lineCount ; index++) {
+		const line = ALDocument.lineAt(index).text;
+		if (line.search(regexpField) >= 0) {
+			for (let indexJSON = 0; indexJSON < RenumberJSON.length; indexJSON++) {
+				if ((line.match(regexpField)[1] === RenumberJSON[indexJSON].FieldID) &&
+				(tableExtDeclaration[1] === RenumberJSON[indexJSON].tableextNumber)) {
+					await RenumberField(ALDocument, RenumberJSON[indexJSON].FieldID, RenumberJSON[indexJSON].NewFieldID,index);
+				}
+			}
+		}
+	}
+}
+async function RenumberField(ALDocument, FieldID, NewFieldID, index) {
+	if (NewFieldID === '') {
+		return;
+	}
+	if (FieldID === NewFieldID) {
+		return;
+	}
+	const line = ALDocument.lineAt(index).text;
+	const newLine = line.replace(FieldID, NewFieldID);
+	const WSEdit = new vscode.WorkspaceEdit;
+	const PositionOpen = new vscode.Position(index, 0);
+	const PostionEnd = new vscode.Position(index, line.length);
+	WSEdit.replace(await ALDocument.uri, new vscode.Range(PositionOpen, PostionEnd),
+	newLine);
+	vscode.workspace.applyEdit(WSEdit);
 }

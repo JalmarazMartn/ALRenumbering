@@ -48,7 +48,12 @@ function activate(context) {
 	});
 	context.subscriptions.push(CreateCSVTableExtFieldsFile);
 
-
+	let RenumberFields = vscode.commands.registerCommand('JAMRenumbering.RenumberFields', function () {
+		const fieldsFromExtension = require('./src/renumberFields.js');		
+		fieldsFromExtension.ProcessRenumFile();
+	}
+	);
+	context.subscriptions.push(RenumberFields);
 }
 // @ts-ignore
 exports.activate = activate;
