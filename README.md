@@ -26,6 +26,14 @@ Command will ask the source CSV file with the renumbering and execute renumberin
 
 New command "JAM Update previous CSV Renumbering file with new objects in workspace", merge an existing CSV objects with set renumbering with new objects in workspace. The steps are: F1 "JAM Update previous CSV Renumbering file with new objects in workspace", select previous CSV file and then select target new merged file. They can be the same.
 
+## Renumbering fields from tableextension
+
+A new feature is added to the Renumbering command, to renumber fields from tableextension. This works alike previous renumbering options:
+
+- First create a new CSV file with existing fields form existing tableextensions. The SCV file has a last column with the new ID of the field. You can create the CSV file with the command "JAM Create CSV table with extension fields to renumber".
+
+- Whren the new ids are filled in the CSV file, we can can launch the fields renumbering with the command "JAM Apply field extension renumbering from CSV file". This commnadwill open a file dialog to select the CSV file with the tableextencion fields renumbering and then will execute the renumbering.
+
 ## New empty table objects generation command.
 
 Sometimes in upgrading processes we need a copy of app tables and tableextensions, but logic, only fields and primary key, no procedures, triggers, and no other properties. You can generate these empty tables in a target directory, executing this command in the original app workspace: "JAM Generate empty logic table objects in target folder"
@@ -145,3 +153,7 @@ Error taking the object declaration from the first line. It is now the first lin
 ### 0.2.1
 
 Fixing some erratic behavior in renumeration related to asynchronous execution. Showing execution log in the output channel.
+
+### 0.2.2
+
+New feature to renumber fields from tableextensions.
