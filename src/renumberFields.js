@@ -76,7 +76,6 @@ async function ProcessRenumFile() {
 				"FieldID": Elements[2],
 				"NewFieldID": Elements[4]
 			});
-		console.log(RenumberJSON);
 	});
 	rd.on('close',function () {			
 			Renumber(RenumberJSON);	
@@ -122,7 +121,7 @@ async function RenumberField(ALDocument, FieldID, NewFieldID, index) {
 	const WSEdit = new vscode.WorkspaceEdit;
 	const PositionOpen = new vscode.Position(index, 0);
 	const PostionEnd = new vscode.Position(index, line.length);
-	WSEdit.replace(await ALDocument.uri, new vscode.Range(PositionOpen, PostionEnd),
+	await WSEdit.replace(await ALDocument.uri, new vscode.Range(PositionOpen, PostionEnd),
 	newLine);
-	vscode.workspace.applyEdit(WSEdit);
+	await vscode.workspace.applyEdit(WSEdit);
 }

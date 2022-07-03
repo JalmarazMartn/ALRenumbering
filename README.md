@@ -157,3 +157,7 @@ Fixing some erratic behavior in renumeration related to asynchronous execution. 
 ### 0.2.2
 
 New feature to renumber fields from tableextensions.
+
+### 0.2.3
+
+Fix on new feature to renumber fields from tableextensions. Only apply renumbering in first field of the extension it cathchs and leave the rest of the fields as is.
