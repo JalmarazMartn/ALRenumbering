@@ -161,3 +161,7 @@ New feature to renumber fields from tableextensions.
 ### 0.2.3
 
 Fix on new feature to renumber fields from tableextensions. Only apply renumbering in first field of the extension it cathchs and leave the rest of the fields as is.
+
+### 0.2.4
+
+Avoid renumbering error due asynchronous execution.

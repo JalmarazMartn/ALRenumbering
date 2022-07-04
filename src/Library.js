@@ -48,9 +48,9 @@ async function ProcessWorkSpace(RenumberJSON = []) {
 				const WSEdit = new vscode.WorkspaceEdit;
 				const PositionOpen = new vscode.Position(0, 0);
 				const PostionEnd = new vscode.Position(0, DeclarationLineText.length);
-				WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
+				await WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
 					LineReplaced);
-				vscode.workspace.applyEdit(WSEdit);
+				await vscode.workspace.applyEdit(WSEdit);
 				OutputChannel.appendLine('Replaced ' + DeclarationLineText + ' with ' + LineReplaced);
 			}
 		}
