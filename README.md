@@ -165,3 +165,7 @@ Fix on new feature to renumber fields from tableextensions. Only apply renumberi
 ### 0.2.4
 
 Avoid renumbering error due asynchronous execution.
+
+### 0.2.5
+
+Issue when the object declaration is not the first line. Leave two declation lines in the object.

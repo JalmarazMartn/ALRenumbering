@@ -46,8 +46,9 @@ async function ProcessWorkSpace(RenumberJSON = []) {
 			if ((NumberRelation.NewID != '') && (NumberRelation.NewID != NumberRelation.OldID)) {
 				const LineReplaced = DeclarationLineText.replace(NumberRelation.OldID, NumberRelation.NewID);
 				const WSEdit = new vscode.WorkspaceEdit;
-				const PositionOpen = new vscode.Position(0, 0);
-				const PostionEnd = new vscode.Position(0, DeclarationLineText.length);
+				const DeclarationLineNumber = GetDeclarationLineNumber(ALDocument);
+				const PositionOpen = new vscode.Position(DeclarationLineNumber , 0);
+				const PostionEnd = new vscode.Position(DeclarationLineNumber, DeclarationLineText.length);
 				await WSEdit.replace(ALDocumentURI, new vscode.Range(PositionOpen, PostionEnd),
 					LineReplaced);
 				await vscode.workspace.applyEdit(WSEdit);
@@ -176,16 +177,24 @@ function optionsCSVFile(newOpenLabel = '') {
 	return options;
 }
 function GetDeclarationLineText(ALDocument) {
-	let DeclarationLineLext = '';
+	const DeclarationLineNumber = GetDeclarationLineNumber(ALDocument);
+	if (DeclarationLineNumber < 0) {
+		return '';
+	}
+	return ALDocument.lineAt(DeclarationLineNumber).text;
+}
+function GetDeclarationLineNumber(ALDocument) {
+	let DeclarationLineNumber = -1;
 	for (let index = 0; index < ALDocument.lineCount; index++) {
 		let matchDeclaration = ALDocument.lineAt(index).text.match(declarationRegExp);
 		if (matchDeclaration) {
-			DeclarationLineLext = ALDocument.lineAt(index).text;
-			return DeclarationLineLext;
+			DeclarationLineNumber = index;
+			return DeclarationLineNumber;
 		}
 	}
-	return DeclarationLineLext;
+	return DeclarationLineNumber;
 }
+
 function GetCurrentObjectFromDocument(ALDocument) {
 	let DeclarationLineLext = GetDeclarationLineText(ALDocument);
 	let ObjectDeclaration = GetCurrentObjectFromLineText(DeclarationLineLext);
