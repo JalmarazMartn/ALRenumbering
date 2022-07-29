@@ -6,6 +6,13 @@ let menuNode = {
     UsageCategory: ''
 }
 let menuNodeList = [];
+module.exports = {
+    setUsageCategory: function()
+    {
+        processMenuTxtfile();
+    }
+}
+    
 async function processMenuNodes(menuNodeList) {
     let OutputChannel = vscode.window.createOutputChannel('Set Usage Category');
     OutputChannel.clear();
@@ -44,4 +51,28 @@ async function appendUsageinDocument(ALDocument, UsageCategory) {
     await WSEdit.insert(ALDocument.uri, PositionOpen, 'UsageCategory = "' + menuNode.UsageCategory + '"');
     await vscode.workspace.applyEdit(WSEdit);    
 }
+async function processMenuTxtfile()
+{
+    const fs = require('fs');
+    const filePath = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        openLabel: 'Select Menu.txt file'
+    });
+    const menuTxtFile = fs.readFileSync(filePath[0].fsPath, 'utf8');
 
+    const itemRegex = /RunObjectType=(\w+);RunObjectID=(\d+);.+DepartmentCategory=(\w+)/gmi;
+    menuTxtFile.replace(/\\n/gm, '');
+    let match = itemRegex.exec(menuTxtFile);
+    while (match != null) {
+        menuNode = {
+            Type: match[1],
+            Id: match[2],
+            UsageCategory: match[3]
+        }
+        menuNodeList.push(menuNode);
+        match = itemRegex.exec(menuTxtFile);
+    }
+    console.log(menuNodeList);
+}
