@@ -8,10 +8,13 @@ let menuNode = {
 let menuNodeList = [];
 module.exports = {
     setUsageCategory: function () {
-        processMenuTxtfile();
+        setUsageCategory();
     }
 }
-
+async function setUsageCategory() {
+    await processMenuTxtfile();    
+    await processMenuNodes(menuNodeList);
+}
 async function processMenuNodes(menuNodeList) {
     let OutputChannel = vscode.window.createOutputChannel('Set Usage Category');
     OutputChannel.clear();
@@ -43,11 +46,26 @@ function GetDeclarationLineNumber(ALDocument) {
     return Library.GetDeclarationLineNumber(ALDocument);
 }
 
-async function appendUsageinDocument(ALDocument, UsageCategory) {
+async function appendUsageinDocument(ALDocument, newUsageCategory) {
     const WSEdit = new vscode.WorkspaceEdit;
     const DeclarationLineNumber = GetDeclarationLineNumber(ALDocument);
-    const PositionOpen = new vscode.Position(DeclarationLineNumber, 0);
-    await WSEdit.insert(ALDocument.uri, PositionOpen, 'UsageCategory = "' + menuNode.UsageCategory + '"');
+    const PositionOpen = new vscode.Position(DeclarationLineNumber+2, 0);
+    let newUsageCategoryProperty = 'UsageCategory = ' + newUsageCategory + ';';
+    const usageRegex = /UsageCategory\s*=\s*\w+;/gmi;
+    let newText = '';
+    if (ALDocument.getText().search(usageRegex) > -1) {
+        newText = ALDocument.getText().replace(usageRegex, newUsageCategoryProperty);
+        if (newText == ALDocument.getText()) {
+            return
+        }        
+    }
+    else
+    {
+    newUsageCategoryProperty = '{\r\n'+newUsageCategoryProperty + '\r\n'+ 'ApplicationArea = All;\r\n';
+    newText = ALDocument.getText().replace('{\r\n', newUsageCategoryProperty);
+    //await WSEdit.insert(ALDocument.uri, PositionOpen, newUsageCategoryProperty);
+    }
+    WSEdit.replace(ALDocument.uri, new vscode.Range(new vscode.Position(0,0),new vscode.Position(ALDocument.lineCount,0)), newText);
     await vscode.workspace.applyEdit(WSEdit);
 }
 async function processMenuTxtfile() {
@@ -70,6 +88,9 @@ async function processMenuTxtfile() {
         let match3 = itemRegex3.exec(menuLines[index]);
         if (match3) {
             menuNode.UsageCategory = match3[1];
+            if (menuNode.UsageCategory == 'Reports') {
+                menuNode.UsageCategory = 'ReportsAndAnalysis';
+            }
             menuNodeList.push({
                 Type: menuNode.Type,
                 Id: menuNode.Id,
@@ -82,8 +103,7 @@ async function processMenuTxtfile() {
         }
         let match1 = itemRegex1.exec(menuLines[index]);
         if (match1) {
-            menuNode.Type = match1[1];
+            menuNode.Type = match1[1].toLowerCase();
         }
     }
-    console.log(menuNodeList);
 }

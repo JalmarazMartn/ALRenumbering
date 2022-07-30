@@ -28,6 +28,9 @@ module.exports = {
 	},
 	GetCurrentObjectFromDocument: function (ALDocument) {
 		return GetCurrentObjectFromDocument(ALDocument);
+	},
+	GetDeclarationLineNumber: function (ALDocument) {
+		return GetDeclarationLineNumber(ALDocument);
 	}
 }
 
