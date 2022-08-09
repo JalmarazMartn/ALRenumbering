@@ -24,8 +24,7 @@
 		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
 		"onCommand:JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
 		"onCommand:JAMRenumbering.CreateCSVTableExtFieldsFile",
-		"onCommand:JAMRenumbering.RenumberFields",
-		"onCommand:JAMRenumbering.setUsageCategory"
+		"onCommand:JAMRenumbering.RenumberFields"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -61,12 +60,7 @@
 			{
 				"command": "JAMRenumbering.RenumberFields",
 				"title": "JAM Apply field extension renumbering from CSV file"
-			},
-			{
-				"command": "JAMRenumbering.setUsageCategory",
-				"title": "JAM Set usage category from an old txt menu file"
-			}
-		]
+			}		]
 	},
 	"scripts": {
 		"lint": "eslint .",

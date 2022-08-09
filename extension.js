@@ -55,12 +55,6 @@ function activate(context) {
 	);
 	context.subscriptions.push(RenumberFields);
 
-	let setUsageCategory = vscode.commands.registerCommand('JAMRenumbering.setUsageCategory', function () {
-		const setUsageCategory = require('./src/setUsageCatagory');		
-		setUsageCategory.setUsageCategory();
-	}
-	);
-	context.subscriptions.push(setUsageCategory);
 }
 // @ts-ignore
 exports.activate = activate;
