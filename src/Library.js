@@ -95,7 +95,7 @@ function GetCurrentObjectFromLineText(DeclarationLineText = '') {
 	}
 	CurrentObject =
 	{
-		ObjectType: DeclaratioMatch[1],
+		ObjectType: DeclaratioMatch[1].toLowerCase(),
 		ObjectID: DeclaratioMatch[2],
 		ObjectName: extendsRemoved(DeclaratioMatch[3])
 	}
@@ -134,7 +134,7 @@ async function ProcessRenumFile(EndProccesingFuntcion) {
 		const Elements = line.split(';');
 		RenumberJSON.push(
 			{
-				"ObjectType": Elements[0],
+				"ObjectType": Elements[0].toLowerCase(),
 				"PreviousID": Elements[1],
 				"NewID": Elements[3]
 			});

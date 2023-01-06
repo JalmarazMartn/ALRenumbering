@@ -6,7 +6,7 @@ This extension implements the old renumbering utility from C/AL to AL.
 
 This Renumber implementation has two commands: "Create initial CSV file" and "JAM Renumber Al Objects from CSV file"
 
-Go to command palette and find "JAM Create initial CSV file":
+Go to command palette and find "JAM Create Initial Renumbering CSV ready for fill new ids":
 
 ![alt text](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/CreateFile.gif?raw=true)
 
@@ -169,3 +169,7 @@ Avoid renumbering error due asynchronous execution.
 ### 0.2.5
 
 Issue when the object declaration is not the first line. Leave two declation lines in the object.
+
+### 0.2.6
+
+Extend the name of the command to "JAM Create Initial Renumbering CSV ready for fill new ids". Case ignore matching object type.

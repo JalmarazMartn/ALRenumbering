@@ -3,7 +3,7 @@
 	"displayName": "JAM AL Renumbering Tool",
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
-	"version": "0.2.5",
+	"version": "0.2.6",
 	"icon": "images/Numbers.png",
 	"repository": "https://github.com/JalmarazMartn/ALRenumbering",
 	"engines": {
@@ -35,7 +35,7 @@
 			},
 			{
 				"command": "JAMRenumbering.CreateCSVFile",
-				"title": "JAM Create Initial CSV ready for fill new ids"
+				"title": "JAM Create Initial Renumbering CSV ready for fill new ids"
 			},
 			{
 				"command": "JAMRenumbering.UpdatePreviousCSVFile",
