@@ -1,6 +1,6 @@
 
 const vscode = require('vscode');
-const Library = require('./Library');
+const Library = require('./renumLibrary');
 const carriage = '\r\n';
 const sep = ';';
 //declare all the regexps in module scope
