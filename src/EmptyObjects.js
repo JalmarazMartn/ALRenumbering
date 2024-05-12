@@ -22,7 +22,7 @@ async function CreateTableObjectsWithoutLogicGeneric() {
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const Library = require('./renumLibrary');
+		const Library = require('./Library');
 		const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 		if (IsTableObject(DeclarationLineText)) {
 			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath);
@@ -72,7 +72,7 @@ async function SelectTextTargetFile() {
 }
 
 function IsTableObject(DeclarationLineText = '') {
-	let Library = require('./renumLibrary')
+	let Library = require('./Library')
 	let CurrentObject = Library.GetCurrentObjectFromLineText(DeclarationLineText);
 	if (!CurrentObject) {
 		return false;
@@ -83,7 +83,7 @@ function IsTableObject(DeclarationLineText = '') {
 	return IsTableExtensionObject(DeclarationLineText);
 }
 function IsTableExtensionObject(DeclarationLineText = '') {
-	let Library = require('./renumLibrary')
+	let Library = require('./Library')
 	let CurrentObject = Library.GetCurrentObjectFromLineText(DeclarationLineText);
 	if (!CurrentObject) {
 		return false;
@@ -105,7 +105,7 @@ async function WriteFileWithOutCode(ALDocument, FolderName = '') {
 function GetAllEmptyObjectContent(ALDocument) {
 	let FinalText = '';
 	let FinalFieldsText = GetFinalFieldsText(ALDocument);
-	let Library = require('./renumLibrary');
+	let Library = require('./Library');
 	FinalText = FinalText + ALDocument.lineAt(0).text + carriage;
 	FinalText = FinalText + '{' + carriage;
 	FinalText = FinalText + FinalFieldsText + carriage;

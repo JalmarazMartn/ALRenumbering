@@ -63,7 +63,7 @@ function optionsTextOpen(newOpenLabel = '') {
 }
 
 function writeFieldObject(ALDocument, fieldsToAdd) {
-	let Library = require('./renumLibrary');
+	let Library = require('./Library');
 	const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 	const EmptyObjects = require('./EmptyObjects.js')
 	if (!EmptyObjects.IsTableExtensionObject(DeclarationLineText)) { return }
