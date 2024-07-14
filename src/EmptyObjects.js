@@ -1,6 +1,5 @@
 //Enums
 //Formato
-
 const vscode = require('vscode');
 const tableExtensionDec = 'TABLEEXTENSION';
 const tableDec = 'TABLE';
@@ -18,16 +17,24 @@ module.exports = {
 	ConvertObjectTextToCAL: function (ObjectText) { return ConvertObjectTextToCAL(ObjectText) }
 }
 async function CreateTableObjectsWithoutLogicGeneric() {
-	const FolderName = await SelectFolder();
+	const fromObjectNumber = await getFromObjectNumer();
+	if (fromObjectNumber == 0)
+		{return;}
+	let emptyObjectNumber = fromObjectNumber;
+	let codeunitDataT = '';
+	const FolderName = await SelectFolder();	
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const Library = require('./Library');
 		const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
-		if (IsTableObject(DeclarationLineText)) {
-			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath);
+		if (IsTableObject(DeclarationLineText)) {			
+			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath,emptyObjectNumber);
+			codeunitDataT = codeunitDataT + getTransferProcedure(ALDocument,emptyObjectNumber);
+			emptyObjectNumber = emptyObjectNumber + 1;			
 		}
 	}
+	createCodeunitFile(codeunitDataT,fromObjectNumber,FolderName[0].fsPath);
 }
 
 async function CreateTableObjectsWithoutLogicGenericCSIDE() {
@@ -93,8 +100,8 @@ function IsTableExtensionObject(DeclarationLineText = '') {
 	}
 	return false;
 }
-async function WriteFileWithOutCode(ALDocument, FolderName = '') {
-	let FinalText = GetAllEmptyObjectContent(ALDocument);
+async function WriteFileWithOutCode(ALDocument, FolderName = '',emptyObjectNumber=0) {
+	let FinalText = GetAllEmptyObjectContent(ALDocument,emptyObjectNumber);
 	if (FinalText == '') {
 		return;
 	}
@@ -102,12 +109,13 @@ async function WriteFileWithOutCode(ALDocument, FolderName = '') {
 	const fileUri = vscode.Uri.file(FolderName + '/' + 'Empty.' + OnlyName);
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
 }
-function GetAllEmptyObjectContent(ALDocument) {
+function GetAllEmptyObjectContent(ALDocument,emptyObjectNumber) {
 	let FinalText = '';
 	let FinalFieldsText = GetFinalFieldsText(ALDocument);
 	let Library = require('./Library');
-	FinalText = FinalText + ALDocument.lineAt(0).text + carriage;
+	FinalText = FinalText + convertDeclarationLineText(Library.GetDeclarationLineText(ALDocument),emptyObjectNumber) + carriage;
 	FinalText = FinalText + '{' + carriage;
+	FinalText = FinalText + 'DataClassification = CustomerContent;' + carriage;
 	FinalText = FinalText + FinalFieldsText + carriage;
 	if (FinalFieldsText == '') {
 		return '';
@@ -168,13 +176,13 @@ function GetFinalKeysText(ALDocument) {
 	return '';
 }
 function MatchWithFieldDeclaration(lineText = '') {
-	var ElementMatch = lineText.match(/\s*field\s*\(.*;.*;.*\)/i);
+	var ElementMatch = lineText.match(/\s*field\s*\(\s*\d+\s*;.*;.*\)/i);
 	if (ElementMatch) {
 		return ElementMatch[0].toString();
 	}
 }
 function MatchWithKeyDeclaration(lineText = '') {
-	var ElementMatch = lineText.match(/\s*key\s*\(.*\)/gi);
+	var ElementMatch = lineText.match(/\s+key\s*\(.*\)/gi);
 	if (ElementMatch) {
 		return ElementMatch[0].toString();
 	}
@@ -230,4 +238,68 @@ function ConvertToOptionCAL(fullMatch) {
 }
 function ConvertToUppercase(fullMatch) {
 	return fullMatch.toUpperCase();
+}
+async function getFromObjectNumer()
+{
+	const firstInValue = await vscode.window.showInputBox({"valueSelection":[50000,99999],"prompt":"Type first object ID (number of 5 digits sugested)","value":"99010"});
+	try {
+		return parseInt(firstInValue);
+	} catch (error) {
+		vscode.window.showErrorMessage(error);
+	}
+}
+function convertDeclarationLineText(OldDeclarationLineText = '',newObjectNumber)
+{
+	const Library = require('./Library.js');
+	const objectDeclaration = Library.GetCurrentObjectFromLineText(OldDeclarationLineText);
+	const newObjectName = getNewObjectName(objectDeclaration.ObjectName, newObjectNumber);
+	const newDeclarationText =  'table ' + newObjectNumber.toString() + ' ' + newObjectName;
+	
+	return newDeclarationText;
+}
+function getNewObjectName(ObjectName, newObjectNumber) {
+	
+	let ObjectNameWithoutQuotes = ObjectName.replace(/"/g, '');
+	const newObjectName = newObjectNumber.toString() + ' ' + ObjectNameWithoutQuotes;
+	return '"' + newObjectName.substring(0,29) + '"';
+}
+
+function getTransferProcedure(ALDocument,newObjectNumber)
+{
+	const Library = require('./Library.js');
+	const fromObjDeclaration = Library.GetCurrentObjectFromDocument(ALDocument);
+	const fromObjectName = fromObjDeclaration.ObjectName;	
+	const toObjectName = getNewObjectName(fromObjectName,newObjectNumber);
+	const procedureName = 'Save' + fromObjectName.replace(/\s|"/g,'') + '()';
+	let processText = 'local procedure ' + procedureName + carriage;
+	processText = processText +  'var' + carriage;
+	processText = processText +  'DataTransfer: DataTransfer;' + carriage;
+	processText = processText +  'FromTable: Record ' + fromObjectName + ';' + carriage;
+	processText = processText +  'ToTable: Record ' + toObjectName + ';' + carriage;
+	processText = processText +  'begin' + carriage;
+	processText = processText + 'DataTransfer.SetTables(FromTable.RecordId.TableNo, ToTable.RecordId.TableNo);' + carriage;
+	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
+		if (MatchWithFieldDeclaration(ALDocument.lineAt(index).text)) {
+			let fieldName = ALDocument.lineAt(index).text;
+			fieldName = fieldName.replace(/\s*field\s*\(\s*\d+\s*;\s*/i,'');
+			fieldName = fieldName.replace(/\s*;.*/i,'');
+			processText = processText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;
+		}
+	}
+	processText = processText + 'DataTransfer.CopyRows();' + carriage;
+	processText = processText + 'end;' + carriage;
+	return processText;
+}
+async function createCodeunitFile(ProcedureText='',objectID=0,FolderName='')
+{
+	let finalText = 'codeunit ' + objectID.toString() + '"Save Data To TempTables"' + carriage;
+	finalText = finalText + '{ '+ carriage;
+	finalText = finalText + 'Subtype = Install;'+ carriage;
+	finalText = finalText + 'trigger OnInstallAppPerCompany()' + carriage;
+	finalText = finalText + 'begin' + carriage;
+	finalText = finalText + 'end;' + carriage;
+	finalText = finalText + ProcedureText + carriage;
+	finalText = finalText + '}';
+	const fileUri = vscode.Uri.file(FolderName + '/' + 'SaveDataToTempTables.codeunit.al');
+	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(finalText));
 }
