@@ -24,17 +24,26 @@ async function CreateTableObjectsWithoutLogicGeneric() {
 	let codeunitDataT = '';
 	const FolderName = await SelectFolder();	
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
+	let saveToProcedure = 'local procedure SaveTables()' + carriage + 'begin' + carriage;
+	let backToProcedure = 'local procedure BackToTables()' + carriage + 'begin'+ carriage;
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const Library = require('./Library');
 		const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 		if (IsTableObject(DeclarationLineText)) {			
 			WriteFileWithOutCode(ALDocument, FolderName[0].fsPath,emptyObjectNumber);
-			codeunitDataT = codeunitDataT + getTransferProcedure(ALDocument,emptyObjectNumber);
+			const transferProcElements = getTransferProcedure(ALDocument,emptyObjectNumber);
+			codeunitDataT = codeunitDataT + transferProcElements[0] + transferProcElements[2];
+			saveToProcedure = saveToProcedure + transferProcElements[1] +';' + carriage;
+			backToProcedure  = backToProcedure + transferProcElements[3] +';' + carriage;
 			emptyObjectNumber = emptyObjectNumber + 1;			
 		}
 	}
+	saveToProcedure = saveToProcedure + 'end;' + carriage;
+	backToProcedure  = backToProcedure + 'end;' + carriage;
+	codeunitDataT = saveToProcedure + backToProcedure + codeunitDataT;
 	createCodeunitFile(codeunitDataT,fromObjectNumber,FolderName[0].fsPath);
+	vscode.window.showInformationMessage('Review new transfer codeunit and empty tables from table extensions.');
 }
 
 async function CreateTableObjectsWithoutLogicGenericCSIDE() {
@@ -247,6 +256,7 @@ async function getFromObjectNumer()
 	} catch (error) {
 		vscode.window.showErrorMessage(error);
 	}
+	return 0;
 }
 function convertDeclarationLineText(OldDeclarationLineText = '',newObjectNumber)
 {
@@ -270,25 +280,39 @@ function getTransferProcedure(ALDocument,newObjectNumber)
 	const fromObjDeclaration = Library.GetCurrentObjectFromDocument(ALDocument);
 	const fromObjectName = fromObjDeclaration.ObjectName;	
 	const toObjectName = getNewObjectName(fromObjectName,newObjectNumber);
-	const procedureName = 'Save' + fromObjectName.replace(/\s|"/g,'') + '()';
-	let processText = 'local procedure ' + procedureName + carriage;
-	processText = processText +  'var' + carriage;
-	processText = processText +  'DataTransfer: DataTransfer;' + carriage;
-	processText = processText +  'FromTable: Record ' + fromObjectName + ';' + carriage;
-	processText = processText +  'ToTable: Record ' + toObjectName + ';' + carriage;
-	processText = processText +  'begin' + carriage;
-	processText = processText + 'DataTransfer.SetTables(FromTable.RecordId.TableNo, ToTable.RecordId.TableNo);' + carriage;
+	const fromObjectCompact = fromObjectName.replace(/\s|"|\./g,'');
+	const SaveProcedureName = 'Save' + fromObjectCompact + '()';
+	const BackToProcedureName = 'BackTo' + fromObjectCompact + '()';
+	let SaveProcessText = getBeginDataTProcedure(SaveProcedureName,fromObjectName,toObjectName);
+	let BackToProcessText = getBeginDataTProcedure(BackToProcedureName,toObjectName,fromObjectName);
+
+	let FieldAddValueText = '';
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
 		if (MatchWithFieldDeclaration(ALDocument.lineAt(index).text)) {
 			let fieldName = ALDocument.lineAt(index).text;
 			fieldName = fieldName.replace(/\s*field\s*\(\s*\d+\s*;\s*/i,'');
 			fieldName = fieldName.replace(/\s*;.*/i,'');
-			processText = processText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;
+			FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;
 		}
 	}
-	processText = processText + 'DataTransfer.CopyRows();' + carriage;
-	processText = processText + 'end;' + carriage;
-	return processText;
+	const endProcessText = 'DataTransfer.CopyRows();' + carriage + 'end;' + carriage;
+	SaveProcessText = SaveProcessText + FieldAddValueText;	
+	BackToProcessText = BackToProcessText + FieldAddValueText;
+
+	SaveProcessText = SaveProcessText + endProcessText;	
+	BackToProcessText = BackToProcessText + endProcessText;
+	return [SaveProcessText,SaveProcedureName,BackToProcessText,BackToProcedureName];
+
+	function getBeginDataTProcedure(procedureName,fromObjectName,toObjectName) {
+		let beginProcessText = 'local procedure ' + procedureName + carriage;
+		beginProcessText = beginProcessText + 'var' + carriage;
+		beginProcessText = beginProcessText + 'DataTransfer: DataTransfer;' + carriage;
+		beginProcessText = beginProcessText + 'FromTable: Record ' + fromObjectName + ';' + carriage;
+		beginProcessText = beginProcessText + 'ToTable: Record ' + toObjectName + ';' + carriage;
+		beginProcessText = beginProcessText + 'begin' + carriage;
+		beginProcessText = beginProcessText + 'DataTransfer.SetTables(FromTable.RecordId.TableNo, ToTable.RecordId.TableNo);' + carriage;
+		return beginProcessText;
+	}
 }
 async function createCodeunitFile(ProcedureText='',objectID=0,FolderName='')
 {
@@ -296,7 +320,9 @@ async function createCodeunitFile(ProcedureText='',objectID=0,FolderName='')
 	finalText = finalText + '{ '+ carriage;
 	finalText = finalText + 'Subtype = Install;'+ carriage;
 	finalText = finalText + 'trigger OnInstallAppPerCompany()' + carriage;
-	finalText = finalText + 'begin' + carriage;
+	finalText = finalText + 'begin' + carriage;	
+	finalText = finalText + '//SaveTables();' + carriage;
+	finalText = finalText + '//BackToTables();' + carriage;
 	finalText = finalText + 'end;' + carriage;
 	finalText = finalText + ProcedureText + carriage;
 	finalText = finalText + '}';
