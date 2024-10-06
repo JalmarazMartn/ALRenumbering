@@ -1,7 +1,7 @@
 //Enums
 //Formato
 const vscode = require('vscode');
-const Library = require('./Library');
+const Library = require('./Library.js');
 const tableDec = 'TABLE';
 const carriage = '\r\n';
 const ObjectCaption = 'OBJECT';
@@ -12,7 +12,6 @@ module.exports = {
 	CreateTableObjectsWithoutLogicCAL: function () {
 		CreateTableObjectsWithoutLogicGenericCSIDE();
 	},
-	GetFieldsText: function (ALDocument) { return GetFieldsText(ALDocument) },
 	ConvertObjectTextToCAL: function (ObjectText) { return ConvertObjectTextToCAL(ObjectText) }
 }
 async function CreateTableObjectsWithoutLogicGeneric() {
@@ -26,7 +25,6 @@ async function CreateTableObjectsWithoutLogicGeneric() {
 	let backToProcedure = 'local procedure BackToTables()' + carriage + 'begin' + carriage;
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
-		const Library = require('./Library');
 		const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 		if (IsTableObject(DeclarationLineText)) {
 			let ALDocExtended = {};
@@ -34,7 +32,7 @@ async function CreateTableObjectsWithoutLogicGeneric() {
 			if (Library.IsTableExtensionObject(Library.GetDeclarationLineText(ALDocument))) {
 				ALDocExtended = await Library.getALDocExtended(ALDocument);
 			}
-			const transferProcElements = getTransferProcedure(ALDocument, emptyObjectNumber, ALDocExtended);
+			const transferProcElements = getTransferProcedure(ALDocument, emptyObjectNumber, ALDocExtended);//aqui
 			codeunitDataT = codeunitDataT + transferProcElements[0] + transferProcElements[2];
 			saveToProcedure = saveToProcedure + transferProcElements[1] + ';' + carriage;
 			backToProcedure = backToProcedure + transferProcElements[3] + ';' + carriage;
@@ -111,13 +109,13 @@ async function WriteFileWithOutCode(ALDocument, FolderName = '', emptyObjectNumb
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
 }
 function GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended) {
-	let FinalText = '';
-	let fieldsText = GetFieldsText(ALDocument);
-	if (ALDocExtended) {
-		fieldsText = GetFieldsText(ALDocExtended) + carriage + fieldsText;
-	}
-	let FinalFieldsText = GetFinalFieldsText(fieldsText);
 	let Library = require('./Library');
+	let FinalText = '';
+	let fieldsText = Library.GetFieldsText(ALDocument);
+	if (ALDocExtended) {
+		fieldsText = Library.GetFieldsText(ALDocExtended) + carriage + fieldsText;
+	}
+	let FinalFieldsText = GetFinalFieldsText(fieldsText);	
 	FinalText = FinalText + convertDeclarationLineText(Library.GetDeclarationLineText(ALDocument), emptyObjectNumber) + carriage;
 	FinalText = FinalText + '{' + carriage;
 	FinalText = FinalText + 'DataClassification = CustomerContent;' + carriage;
@@ -143,37 +141,6 @@ function GetFinalFieldsText(fieldsText = '') {
 	}
 	return FinalText;
 }
-function GetFieldsText(ALDocument) {
-	let FinalText = '';
-	let CurrElement = { ElementText: "", ElementOpenLine: 0 };
-	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
-		if (MatchWithFieldDeclaration(ALDocument.lineAt(index).text)) {
-			CurrElement.ElementText = ALDocument.lineAt(index).text;
-			CurrElement.ElementOpenLine = index;
-		}
-		else {
-			if (CurrElement.ElementText !== '') {
-				CurrElement.ElementText = CurrElement.ElementText + ALDocument.lineAt(index).text;
-				if (GetIsFlowField(CurrElement.ElementText)) {
-					CurrElement.ElementOpenLine = 0;
-					CurrElement.ElementText = '';
-				}
-			}
-		}
-		let WriteElement = (MatchWithClose(ALDocument.lineAt(index).text)) &&
-			(CurrElement.ElementText != '');
-		if (WriteElement) {
-			for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index; ElemNumber++) {
-				if (GetContentToWrite(ALDocument.lineAt(ElemNumber).text))
-					FinalText = FinalText + (GetContentToWrite(ALDocument.lineAt(ElemNumber).text)) + carriage;
-			}
-			FinalText = FinalText + '}' + carriage;
-			CurrElement.ElementText = '';
-			CurrElement.ElementOpenLine = 0;
-		}
-	}
-	return FinalText;
-}
 function GetFinalKeysText(ALDocument) {
 	const primaryKeyText = Library.GetPrimaryKeyText(ALDocument);
 	if (primaryKeyText !== '') {
@@ -183,35 +150,6 @@ function GetFinalKeysText(ALDocument) {
 
 	}
 	return '';
-}
-function MatchWithFieldDeclaration(lineText = '') {
-	var ElementMatch = lineText.match(/\s*field\s*\(\s*\d+\s*;.*;.*\)/i);
-	if (ElementMatch) {
-		return ElementMatch[0].toString();
-	}
-}
-function MatchWithOptionMembers(lineText = '') {
-	var ElementMatch = lineText.match(/\s*OptionMembers =.*;/gi);
-	if (ElementMatch) {
-		return ElementMatch[0].toString();
-	}
-}
-function MatchWithClose(lineText = '') {
-	return (lineText.indexOf('}') >= 0)
-}
-function GetContentToWrite(lineText = '') {
-	if (MatchWithFieldDeclaration(lineText)) {
-		return MatchWithFieldDeclaration(lineText) + carriage + '{';
-	}
-	if (Library.MatchWithKeyDeclaration(lineText)) {
-		return Library.MatchWithKeyDeclaration(lineText) + carriage + '{}' + carriage + '}';
-	}
-	if (MatchWithOptionMembers(lineText)) {
-		return MatchWithOptionMembers(lineText) + carriage;
-	}
-}
-function GetIsFlowField(ElementText = '') {
-	return (ElementText.search(/FieldClass\s*=\s*(FlowField|FlowFilter)\s*;/i) >= 0)
 }
 function ConvertObjectTextToCAL(ObjectText = '') {
 	let ObjectTextCAL = ObjectText.replace(/field\((.*)\;(.*)\;(.*?)\)\s*\{\s*(.*)\s*\}/gmi, ConvertToCALFields);
@@ -252,7 +190,6 @@ async function getFromObjectNumer() {
 	return 0;
 }
 function convertDeclarationLineText(OldDeclarationLineText = '', newObjectNumber) {
-	const Library = require('./Library.js');
 	const objectDeclaration = Library.GetCurrentObjectFromLineText(OldDeclarationLineText);
 	const newObjectName = getNewObjectName(objectDeclaration.ObjectName, newObjectNumber);
 	const newDeclarationText = 'table ' + newObjectNumber.toString() + ' ' + newObjectName;
@@ -267,7 +204,6 @@ function getNewObjectName(ObjectName, newObjectNumber) {
 }
 
 function getTransferProcedure(ALDocument, newObjectNumber, ALDocExtended) {
-	const Library = require('./Library.js');
 	const fromObjDeclaration = Library.GetCurrentObjectFromDocument(ALDocument);
 	const fromObjectName = fromObjDeclaration.ObjectName;
 	const toObjectName = getNewObjectName(fromObjectName, newObjectNumber);
@@ -279,10 +215,8 @@ function getTransferProcedure(ALDocument, newObjectNumber, ALDocExtended) {
 
 	let FieldAddValueText = '';
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
-		if (MatchWithFieldDeclaration(ALDocument.lineAt(index).text)) {
-			let fieldName = ALDocument.lineAt(index).text;
-			fieldName = fieldName.replace(/\s*field\s*\(\s*\d+\s*;\s*/i, '');
-			fieldName = fieldName.replace(/\s*;.*/i, '');
+		if (Library.MatchWithFieldDeclaration(ALDocument.lineAt(index).text) && (!Library.GetIsFlowField(ALDocument.lineAt(index).text))) {
+			const fieldName = Library.getFieldNameFromDeclarationLine(ALDocument.lineAt(index).text);
 			FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;
 		}
 	}
