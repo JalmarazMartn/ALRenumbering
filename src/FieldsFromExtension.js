@@ -66,7 +66,7 @@ function writeFieldObject(ALDocument, fieldsToAdd) {
 	let Library = require('./Library');
 	const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 	const EmptyObjects = require('./EmptyObjects.js')
-	if (!EmptyObjects.IsTableExtensionObject(DeclarationLineText)) { return }
+	if (!Library.IsTableExtensionObject(DeclarationLineText)) { return }
 	let fieldText = EmptyObjects.GetFieldsText(ALDocument);
 	if (fieldText == '') {
 		return;

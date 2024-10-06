@@ -17,14 +17,6 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:JAMRenumbering.Renumber",
-		"onCommand:JAMRenumbering.CreateCSVFile",
-		"onCommand:JAMRenumbering.UpdatePreviousCSVFile",
-		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogic",
-		"onCommand:JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
-		"onCommand:JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
-		"onCommand:JAMRenumbering.CreateCSVTableExtFieldsFile",
-		"onCommand:JAMRenumbering.RenumberFields"
 	],
 	"main": "./extension.js",
 	"contributes": {

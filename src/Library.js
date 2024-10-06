@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const carriage = '\r\n';
 const declarationRegExp = /\s*([a-zA-Z]+)\s*([0-9]+)\s+(.*)/i;
 const OutputChannel = vscode.window.createOutputChannel(`Output Channel`);
+const tableExtensionDec = 'TABLEEXTENSION';
 module.exports = {
 	ProcessWorkSpace: function (RenumberJSON = []) {
 		ProcessWorkSpace(RenumberJSON);
@@ -31,6 +32,23 @@ module.exports = {
 	},
 	GetDeclarationLineNumber: function (ALDocument) {
 		return GetDeclarationLineNumber(ALDocument);
+	},
+	getALDocExtended: async function (ALDocument)
+	{
+		return await getALDocExtended(ALDocument);
+	},
+	IsTableExtensionObject: function (DeclarationLineText = '') 
+	{
+		 return IsTableExtensionObject(DeclarationLineText) 
+	},
+	MatchWithKeyDeclaration: function(lineText = '') {
+		return MatchWithKeyDeclaration(lineText = '');			
+	},	
+	GetPrimaryKeyText: function(ALDocument) {
+		return GetPrimaryKeyText(ALDocument);
+	},
+	getPrimaryKeyFields: function(ALDocument){
+		return getPrimaryKeyFields(ALDocument);
 	}
 }
 
@@ -86,7 +104,7 @@ function GetCurrentObjectFromLineText(DeclarationLineText = '') {
 	{
 		ObjectType: '',
 		ObjectID: '',
-		ObjectName: ''
+		ObjectName: ''		
 	}
 		;
 	var DeclaratioMatch = DeclarationLineText.match(declarationRegExp);
@@ -97,7 +115,7 @@ function GetCurrentObjectFromLineText(DeclarationLineText = '') {
 	{
 		ObjectType: DeclaratioMatch[1].toLowerCase(),
 		ObjectID: DeclaratioMatch[2],
-		ObjectName: extendsRemoved(DeclaratioMatch[3])
+		ObjectName: originalObjectName(DeclaratioMatch[3])
 	}
 	return CurrentObject;
 }
@@ -161,12 +179,13 @@ async function CreateCSVFile(RenumberJSON) {
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
 }
-function extendsRemoved(OldName = '') {
+function originalObjectName(OldName = '') {
 	var extendsPosition = OldName.search(/\s+extends\s+/i);
 	if (extendsPosition < 0) {
 		return OldName;
 	}
-	return OldName.substring(0, extendsPosition);
+	return OldName.replace(/.*\s+extends\s+/i,'');
+	//return OldName.substring(0, extendsPosition);
 }
 function optionsCSVFile(newOpenLabel = '') {
 	const options = {
@@ -202,4 +221,72 @@ function GetCurrentObjectFromDocument(ALDocument) {
 	let DeclarationLineLext = GetDeclarationLineText(ALDocument);
 	let ObjectDeclaration = GetCurrentObjectFromLineText(DeclarationLineLext);
 	return ObjectDeclaration;
+}
+async function getObjectDefinition(currDocument,startRange) {
+    console.log('vscode.executeDefinitionProvider');
+	let locations = await vscode.commands.executeCommand('vscode.executeDefinitionProvider',
+		currDocument.uri, startRange);
+	
+		// console.log(await document.lineAt(vscode.window.activeTextEditor.selection.start.line).text);
+    if (locations) {
+        let doc = await vscode.workspace.openTextDocument(locations[0].uri);
+   		return doc;
+    }
+}
+async function getALDocExtended(ALDocument)
+{	
+	const DeclarationLineLext = GetDeclarationLineText(ALDocument);
+	const extendsTok = 'extends';
+	const regexpExtends = new RegExp(extendsTok,'i');
+	if (!IsTableExtensionObject(DeclarationLineLext))
+	{
+		return;
+	}
+	let originalNamePosition = DeclarationLineLext.search(regexpExtends) + extendsTok.length +1;
+	for (let index = originalNamePosition; index < DeclarationLineLext.length; index++) {		
+		if (DeclarationLineLext[index] !== ' ')
+		{			
+			return await getObjectDefinition(ALDocument,new vscode.Position(GetDeclarationLineNumber(ALDocument),index));
+		}
+	}
+}
+function IsTableExtensionObject(DeclarationLineText = '') {
+	let Library = require('./Library')
+	let CurrentObject = Library.GetCurrentObjectFromLineText(DeclarationLineText);
+	if (!CurrentObject) {
+		return false;
+	}
+	if (CurrentObject.ObjectType.toUpperCase() == tableExtensionDec) {
+		return true;
+	}
+	return false;
+}
+function getPrimaryKeyFields(ALDocument)
+{
+	let primaryKeyText = GetPrimaryKeyText(ALDocument);	
+	primaryKeyText = primaryKeyText.replace(/key\s*\(.*;/i,'');
+	primaryKeyText = primaryKeyText.replace(/\)/i,'')	
+	if (primaryKeyText == '')
+	{
+		return;
+	}
+	let primaryKeyFields = primaryKeyText.split(',');
+	for (let index = 0; index < primaryKeyFields.length; index++) {
+		primaryKeyFields[index] = primaryKeyFields[index].trim();		
+	}
+	return primaryKeyFields;
+}
+function GetPrimaryKeyText(ALDocument) {
+	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
+		if (MatchWithKeyDeclaration(ALDocument.lineAt(index).text)) {
+			return MatchWithKeyDeclaration(ALDocument.lineAt(index).text);
+		}
+	}
+	return '';
+}
+function MatchWithKeyDeclaration(lineText = '') {
+	var ElementMatch = lineText.match(/\s+key\s*\(.*\)/gi);
+	if (ElementMatch) {
+		return ElementMatch[0].toString();
+	}
 }
