@@ -214,11 +214,10 @@ function getTransferProcedure(ALDocument, newObjectNumber, ALDocExtended) {
 	let BackToProcessText = getBeginDataTProcedure(BackToProcedureName, toObjectName, fromObjectName);
 
 	let FieldAddValueText = '';
-	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
-		if (Library.MatchWithFieldDeclaration(ALDocument.lineAt(index).text) && (!Library.GetIsFlowField(ALDocument.lineAt(index).text))) {
-			const fieldName = Library.getFieldNameFromDeclarationLine(ALDocument.lineAt(index).text);
-			FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;
-		}
+	const realFieldList = Library.getRealFieldList(ALDocument);
+	for (let index = 1; index < realFieldList.length - 1; index++) {
+			const fieldName = realFieldList[index];
+			FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;		
 	}
 	let primaryKeySave = '';
 	let primaryKeyBack = '';
@@ -267,4 +266,6 @@ async function createCodeunitFile(ProcedureText = '', objectID = 0, FolderName =
 	finalText = finalText + '}';
 	const fileUri = vscode.Uri.file(FolderName + '/' + 'SaveDataToTempTables.codeunit.al');
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(finalText));
+	let doc = await vscode.workspace.openTextDocument(fileUri);
+	await vscode.window.showTextDocument(doc);
 }

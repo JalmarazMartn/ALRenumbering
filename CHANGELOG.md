@@ -117,3 +117,7 @@ Extend the name of the command to "JAM Create Initial Renumbering CSV ready for 
 ### 0.2.7
 
 Empty objects: Fix errors in generate empty table objects. Ask for new ids before ask for folder. Create unique name with new Id + old name
+
+### 0.2.8
+
+Empty objects: Create codeunit transfer without compilation errors. Total support for save tableextension fields

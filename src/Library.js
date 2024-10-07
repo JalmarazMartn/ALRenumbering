@@ -50,13 +50,15 @@ module.exports = {
 	},
 	GetFieldsText: function (ALDocument) { return GetFieldsText(ALDocument) },
 	MatchWithFieldDeclaration: function (lineText) { return MatchWithFieldDeclaration(lineText) },
-	getFieldNameFromDeclarationLine: function(lineText)	
-	{
+	getFieldNameFromDeclarationLine: function (lineText) {
 		return getFieldNameFromDeclarationLine(lineText)
 	},
-	GetIsFlowField: function(ElementText)
-	{
+	GetIsFlowField: function (ElementText) {
 		return GetIsFlowField(ElementText);
+	},
+	getRealFieldList: function (ALDocument)
+	{
+		return getRealFieldList(ALDocument);
 	}
 }
 
@@ -294,7 +296,18 @@ function MatchWithKeyDeclaration(lineText = '') {
 	}
 }
 function GetFieldsText(ALDocument) {
+	const fieldsInformation = getFieldsInformation(ALDocument);
+	return fieldsInformation.fieldsTextDefinition;
+}
+
+function getRealFieldList(ALDocument) {
+	const fieldsInformation = getFieldsInformation(ALDocument);
+	return fieldsInformation.realFieldList;
+}
+
+function getFieldsInformation(ALDocument) {
 	let FinalText = '';
+	let realFieldList = [];
 	let CurrElement = { ElementText: "", ElementOpenLine: 0 };
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
 		if (MatchWithFieldDeclaration(ALDocument.lineAt(index).text)) {
@@ -313,6 +326,8 @@ function GetFieldsText(ALDocument) {
 		let WriteElement = (MatchWithClose(ALDocument.lineAt(index).text)) &&
 			(CurrElement.ElementText != '');
 		if (WriteElement) {
+			const fieldName = getFieldNameFromDeclarationLine(CurrElement.ElementText);
+			realFieldList.push(fieldName);
 			for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index; ElemNumber++) {
 				if (GetContentToWrite(ALDocument.lineAt(ElemNumber).text))
 					FinalText = FinalText + (GetContentToWrite(ALDocument.lineAt(ElemNumber).text)) + carriage;
@@ -321,8 +336,11 @@ function GetFieldsText(ALDocument) {
 			CurrElement.ElementText = '';
 			CurrElement.ElementOpenLine = 0;
 		}
+	}	
+	return {
+		fieldsTextDefinition: FinalText,
+		realFieldList: realFieldList
 	}
-	return FinalText;
 }
 function MatchWithFieldDeclaration(lineText = '') {
 	var ElementMatch = lineText.match(/\s*field\s*\(\s*\d+\s*;.*;.*\)/i);
@@ -353,8 +371,7 @@ function MatchWithOptionMembers(lineText = '') {
 		return ElementMatch[0].toString();
 	}
 }
-function getFieldNameFromDeclarationLine(lineText)
-{
+function getFieldNameFromDeclarationLine(lineText) {
 	let fieldName = lineText;
 	fieldName = fieldName.replace(/\s*field\s*\(\s*\d+\s*;\s*/i, '');
 	fieldName = fieldName.replace(/\s*;.*/i, '');
