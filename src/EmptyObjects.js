@@ -113,7 +113,7 @@ function GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended) 
 	let FinalText = '';
 	let fieldsText = Library.GetFieldsText(ALDocument);
 	if (ALDocExtended) {
-		fieldsText = Library.GetFieldsText(ALDocExtended) + carriage + fieldsText;
+		fieldsText = Library.getOnlyFieldsKeyText(ALDocExtended) + carriage + fieldsText;
 	}
 	let FinalFieldsText = GetFinalFieldsText(fieldsText);	
 	FinalText = FinalText + convertDeclarationLineText(Library.GetDeclarationLineText(ALDocument), emptyObjectNumber) + carriage;
@@ -215,7 +215,7 @@ function getTransferProcedure(ALDocument, newObjectNumber, ALDocExtended) {
 
 	let FieldAddValueText = '';
 	const realFieldList = Library.getRealFieldList(ALDocument);
-	for (let index = 1; index < realFieldList.length - 1; index++) {
+	for (let index = 0; index < realFieldList.length; index++) {
 			const fieldName = realFieldList[index];
 			FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;		
 	}

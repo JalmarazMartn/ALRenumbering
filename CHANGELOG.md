@@ -121,3 +121,7 @@ Empty objects: Fix errors in generate empty table objects. Ask for new ids befor
 ### 0.2.8
 
 Empty objects: Create codeunit transfer without compilation errors. Total support for save tableextension fields
+
+### 0.2.9
+
+Empty objects: Problem fixed in transfer code

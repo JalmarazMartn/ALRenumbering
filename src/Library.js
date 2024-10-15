@@ -59,6 +59,10 @@ module.exports = {
 	getRealFieldList: function (ALDocument)
 	{
 		return getRealFieldList(ALDocument);
+	},
+	getOnlyFieldsKeyText: function(ALDocument)
+	{
+		return getOnlyFieldsKeyText(ALDocument);
 	}
 }
 
@@ -304,10 +308,17 @@ function getRealFieldList(ALDocument) {
 	const fieldsInformation = getFieldsInformation(ALDocument);
 	return fieldsInformation.realFieldList;
 }
+function getOnlyFieldsKeyText(ALDocument)
+{
+	const fieldsInformation = getFieldsInformation(ALDocument);
+	return fieldsInformation.onlyFieldsKeyText;
+}
 
 function getFieldsInformation(ALDocument) {
 	let FinalText = '';
+	let onlyFieldsKeyText = '';
 	let realFieldList = [];
+	const primaryKeyFields = getPrimaryKeyFields(ALDocument);
 	let CurrElement = { ElementText: "", ElementOpenLine: 0 };
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {
 		if (MatchWithFieldDeclaration(ALDocument.lineAt(index).text)) {
@@ -328,19 +339,28 @@ function getFieldsInformation(ALDocument) {
 		if (WriteElement) {
 			const fieldName = getFieldNameFromDeclarationLine(CurrElement.ElementText);
 			realFieldList.push(fieldName);
-			for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index; ElemNumber++) {
-				if (GetContentToWrite(ALDocument.lineAt(ElemNumber).text))
-					FinalText = FinalText + (GetContentToWrite(ALDocument.lineAt(ElemNumber).text)) + carriage;
+			FinalText = addFieldTextToExisting(index,CurrElement,ALDocument,FinalText);			
+			if (isKeyField(fieldName,primaryKeyFields))
+			{
+				onlyFieldsKeyText = addFieldTextToExisting(index,CurrElement,ALDocument,onlyFieldsKeyText);
 			}
-			FinalText = FinalText + '}' + carriage;
 			CurrElement.ElementText = '';
-			CurrElement.ElementOpenLine = 0;
+			CurrElement.ElementOpenLine = 0;		
 		}
 	}	
 	return {
 		fieldsTextDefinition: FinalText,
-		realFieldList: realFieldList
+		realFieldList: realFieldList,
+		onlyFieldsKeyText: onlyFieldsKeyText
 	}
+}
+function addFieldTextToExisting(index,CurrElement,ALDocument,ExistingText='') {
+	for (let ElemNumber = CurrElement.ElementOpenLine; ElemNumber <= index; ElemNumber++) {
+		if (GetContentToWrite(ALDocument.lineAt(ElemNumber).text))
+			ExistingText = ExistingText + (GetContentToWrite(ALDocument.lineAt(ElemNumber).text)) + carriage;
+	}
+	ExistingText = ExistingText + '}' + carriage;
+	return ExistingText;
 }
 function MatchWithFieldDeclaration(lineText = '') {
 	var ElementMatch = lineText.match(/\s*field\s*\(\s*\d+\s*;.*;.*\)/i);
@@ -376,4 +396,19 @@ function getFieldNameFromDeclarationLine(lineText) {
 	fieldName = fieldName.replace(/\s*field\s*\(\s*\d+\s*;\s*/i, '');
 	fieldName = fieldName.replace(/\s*;.*/i, '');
 	return fieldName;
+}
+function isKeyField(fieldName, primaryKeyFields) {
+	if (!primaryKeyFields)
+	{
+		return false;
+	}
+	if (primaryKeyFields.length == 0)
+	{
+		return false;
+	}
+	for (let index = 0; index < primaryKeyFields.length; index++) {		
+		if (fieldName.replace('"','') == primaryKeyFields[index].replace('"',''))
+		{return true}
+	}
+	return false;
 }
