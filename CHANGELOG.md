@@ -125,3 +125,7 @@ Empty objects: Create codeunit transfer without compilation errors. Total suppor
 ### 0.2.9
 
 Empty objects: Problem fixed in transfer code
+
+### 0.2.10
+
+Command "JAM Open AL Renumber Tool" to open GUI to remove all previous commands in command bar

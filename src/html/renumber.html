@@ -98,7 +98,11 @@
     Insert Fields C/SIDE
     <span class="tooltiptext">JAM Insert extension fields into old CSIDE table definition text file</span>
   </button>
-  <script>
+  <button onclick="updatePrevFile()">
+    Update previous CSV
+    <span class="tooltiptext">JAM Update previous CSV Renumbering file with new objects in workspace</span>
+  </button>
+<script>
     function executeAction(elementID = '') {
       const messageAction = document.getElementById(elementID).value;
       const vscode = acquireVsCodeApi();
@@ -119,6 +123,10 @@
     }
     function insertFieldsCSIDE() {
       vscode.postMessage({ action: 'insertFieldsCSIDE' });
+    }
+    function updatePrevFile()
+    {
+      vscode.postMessage({ action: 'updatePrevFile' });
     }
   </script>
 </body>

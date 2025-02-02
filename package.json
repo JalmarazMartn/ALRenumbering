@@ -3,7 +3,7 @@
 	"displayName": "JAM AL Renumbering Tool",
 	"description": "AL Renumber objects from CSv file",
 	"publisher": "JessAlmarazMartin",
-	"version": "0.2.9",
+	"version": "0.2.10",
 	"icon": "images/Numbers.png",
 	"repository": "https://github.com/JalmarazMartn/ALRenumbering",
 	"engines": {
@@ -16,8 +16,7 @@
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-	],
+	"activationEvents": [],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
@@ -53,11 +52,11 @@
 				"command": "JAMRenumbering.RenumberFields",
 				"title": "JAM Apply field extension renumbering from CSV file"
 			},
-{
-	"command": "JAMRenumbering.showRenumberHTMLView",
-	"title": "JAM Open Renumber Tool"
-}			
-				]
+			{
+				"command": "JAMRenumbering.showRenumberHTMLView",
+				"title": "JAM Open AL Renumber Tool"
+			}
+		]
 	},
 	"scripts": {
 		"lint": "eslint .",

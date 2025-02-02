@@ -2,6 +2,24 @@
 
 This extension implements the old renumbering utility from C/AL to AL.
 
+## New GUI for invoke all commands 2025
+
+All the commands will be removed, and substituted bay a GUI with buttons. The GUI is called by command "JAM Open AL Renumber Tool":
+
+![New GUI](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/NewGUI.gif?raw=true)
+
+We can see 2 main secctions:
+
+1. Object renumber. Sections to invoke 3 actions for create, open and apply renumering from CSV file. Select and option and push right button execute.
+2. Fields renumbering. The same of above but refered to fields in tableextensions.
+
+In the bottom we have 4 remaining commands (with a tooltip if you pass over the mouse):
+
+1. Clear file: clear the reference to Cuurent file to open actions, to select another.
+2. Generate empty Objects action.
+3. Generate empty C/SIDE Objects action.
+4. Insert fields C/SIDE.
+
 ## Features
 
 This Renumber implementation has two commands: "Create initial CSV file" and "JAM Renumber Al Objects from CSV file"

@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 let ExecNumber = 0;
 let HTMLContent = '';
-let filePath = '';
+let globalFilePath = '';
 module.exports = {
   showRenumberHTMLView: async function (context) {
     await showCodeActionsHTMLView(context);
@@ -32,6 +32,25 @@ async function showCodeActionsHTMLView(context) {
           case 'renumber':
             execRenumber(message.renumType);
             break;
+          case 'clearFile':
+            globalFilePath = '';
+            break;
+          case 'generateEmptyObjects':
+            const EmptyObjects = require('./EmptyObjects.js');
+            EmptyObjects.CreateTableObjectsWithoutLogic();
+            break;
+          case 'generateEmptyObjectsCAL':
+            const EmptyObjectsCAL = require('./EmptyObjects.js');
+            EmptyObjectsCAL.CreateTableObjectsWithoutLogicCAL();
+            break;
+          case 'insertFieldsCSIDE':
+            const fieldsFromExtension = require('./FieldsFromExtension.js');		
+            fieldsFromExtension.InsertExtensionFieldsInCSIDEFile();
+            break;
+          case 'updatePrevFile':
+            const Library = require('./Library.js');		
+            Library.UpdatePreviousCSVFile();
+            break;
         }          
       } catch (error) {
         vscode.window.showErrorMessage(error);
@@ -39,7 +58,7 @@ async function showCodeActionsHTMLView(context) {
 
       WebviewSteps.webview.html = HTMLContent + '<br>' +
               ExecNumber.toString() + '.' + message.action+'-' + message.renumType+ '<br>' +
-            'Current file: ' + filePath;
+            'Current file: ' + globalFilePath;
     },
     undefined,
     context.subscriptions
@@ -58,16 +77,29 @@ async function GetHTMLContent(context) {
 async function createRenumberfile(renumType = '') {
   if (renumType == 'fields') {
     const renumberFields = require('./renumberFields');
-    filePath = await renumberFields.CreateCSVTableExtFieldsFile();
+    globalFilePath = await renumberFields.CreateCSVTableExtFieldsFile();
   }
   else {
     const Library = require('./Library.js');
-    filePath = await Library.CreateNewCSVFile();
+    globalFilePath = await Library.CreateNewCSVFile();
 
   }
 }
-function openCsv() {
-  vscode.env.openExternal(vscode.Uri.file(filePath));
+async function openCsv() {
+  if (globalFilePath == '')
+  {
+    const options = {
+      canSelectMany: false,
+      openLabel: 'Open',
+      title: 'Select CSV File',
+      filters: {
+        'csv': ['csv'],
+      }
+    };
+    const newFileUri = await vscode.window.showOpenDialog(options);
+    globalFilePath = newFileUri[0].path;
+  }
+  vscode.env.openExternal(vscode.Uri.file(globalFilePath));
 
 }
 function execRenumber(renumType = '') {
