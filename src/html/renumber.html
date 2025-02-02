@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>CSV Actions</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      /* Or specify a particular font */
+    }
+
+    button {
+      height: 40px;
+      background-color: orange;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      /* Add margin between buttons */
+      position: relative; /* Required for tooltip positioning */
+    }
+
+    button:hover {
+      background-color: darkorange;
+    }
+
+    button:active {
+      background-color: orangered;
+    }
+
+    button .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      /* Adjust as needed */
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      padding: 5px 0;
+      border-radius: 6px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      /* Position tooltip below the button */
+      left: 50%;
+      margin-left: -100px;
+      /* Center the tooltip */
+      opacity: 0;
+      transition: opacity 0.3s;
+      /* Smooth appearance */
+    }
+
+    button:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Renumbering</h1>
+  <h2>Object renumber</h2>
+  <select id="objects">
+    <option value="doNothing">Choose option bellow</option>
+    <option value="createCsv">1 Create initial CSV File</option>
+    <option value="openCsv">2 Open CSV File and fill new ids manually</option>
+    <option value="renumber">3 Renumber objects from CSV File</option>
+  </select>
+  <button onclick="executeAction('objects')">Execute</button>
+  <br>
+  <br>
+  <h2>Field extension renumber</h2>
+  <select id="fields">
+    <option value="doNothing">Choose option bellow</option>
+    <option value="createCsv">1 Create initial CSV File</option>
+    <option value="openCsv">2 Open CSV File and fill new ids manually</option>
+    <option value="renumber">3 Renumber objects from CSV File</option>
+  </select>
+  <button onclick="executeAction('fields')">Execute</button>
+  <br>
+  <br>
+  <button onclick="clearFile()">
+    Clear File
+    <span class="tooltiptext">Reset CSV File Path</span>
+  </button>
+  <button onclick="generateEmptyObjects()">
+    Generate Empty Objects
+    <span class="tooltiptext">JAM Generate empty logic table objects in target folder</span>
+  </button>
+  <button onclick="generateCSIDEEmptyObjects()">
+    Generate Empty C/SIDE Objects
+    <span class="tooltiptext">JAM Generate empty logic C/AL table objects in target single txt file</span>
+  </button>
+  <button onclick="insertFieldsCSIDE()">
+    Insert Fields C/SIDE
+    <span class="tooltiptext">JAM Insert extension fields into old CSIDE table definition text file</span>
+  </button>
+  <script>
+    function executeAction(elementID = '') {
+      const messageAction = document.getElementById(elementID).value;
+      const vscode = acquireVsCodeApi();
+      vscode.postMessage({
+        action: messageAction,
+        renumType: elementID
+      });
+    }
+    function clearFile() {
+      vscode.postMessage({ action: 'clearFile' });
+    }
+
+    function generateEmptyObjects() {
+      vscode.postMessage({ action: 'generateEmptyObjects' });
+    }
+    function generateCSIDEEmptyObjects() {
+      vscode.postMessage({ action: 'generateCSIDEEmptyObjects' });
+    }
+    function insertFieldsCSIDE() {
+      vscode.postMessage({ action: 'insertFieldsCSIDE' });
+    }
+  </script>
+</body>
+
+</html>

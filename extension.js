@@ -33,7 +33,6 @@ function activate(context) {
 		const EmptyObjects = require('./src/EmptyObjects.js');		
 		EmptyObjects.CreateTableObjectsWithoutLogicCAL();
 	});
-
 	context.subscriptions.push(CreateTableObjectsWithoutLogicCAL);	
 
 	let InsertExtensionFieldsInCSIDEFile = vscode.commands.registerCommand('JAMRenumbering.InsertExtensionFieldsInCSIDEFile', function () {
@@ -55,6 +54,11 @@ function activate(context) {
 	);
 	context.subscriptions.push(RenumberFields);
 
+	let showRenumberHTMLView = vscode.commands.registerCommand('JAMRenumbering.showRenumberHTMLView', function () {
+		const renumberView = require('./src/renumberView.js');
+		renumberView.showRenumberHTMLView(context);
+	});
+	context.subscriptions.push(showRenumberHTMLView);
 }
 // @ts-ignore
 exports.activate = activate;

@@ -7,8 +7,8 @@ const sep = ';';
 const regexpTableExtension = /tableextension\s*(\d+).*extends\s*(.*)/i;
 const regexpField = /field\((.*);(.*);/i;
 module.exports = {
-    CreateCSVTableExtFieldsFile: function () {
-        CreateCSVTableExtFieldsFile();
+    CreateCSVTableExtFieldsFile: async function () {
+        return await CreateCSVTableExtFieldsFile();
     },
 	ProcessRenumFile: function () {
 		ProcessRenumFile();
@@ -26,6 +26,7 @@ async function CreateCSVTableExtFieldsFile() {
     let fileUri = await vscode.window.showSaveDialog(optionsCSVFile('Save'));
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
+	return fileUri.path;
 }
 async function GetFieldsTextFromTableExtension(ALDocument) {
     const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);

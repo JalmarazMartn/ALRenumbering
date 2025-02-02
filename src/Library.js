@@ -14,9 +14,9 @@ module.exports = {
 	RenumberObjects: function () {
 		ProcessRenumFile(ProcessWorkSpace);
 	},
-	CreateNewCSVFile: function () {
+	CreateNewCSVFile: async function () {
 		let EmptyRenumberJSON = [];
-		CreateCSVFile(EmptyRenumberJSON);
+		return await CreateCSVFile(EmptyRenumberJSON);
 	},
 	UpdatePreviousCSVFile: function () {
 		ProcessRenumFile(CreateCSVFile);
@@ -192,6 +192,7 @@ async function CreateCSVFile(RenumberJSON) {
 	}
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
+	return fileUri.path;
 }
 function originalObjectName(OldName = '') {
 	var extendsPosition = OldName.search(/\s+extends\s+/i);

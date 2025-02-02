@@ -52,7 +52,12 @@
 			{
 				"command": "JAMRenumbering.RenumberFields",
 				"title": "JAM Apply field extension renumbering from CSV file"
-			}		]
+			},
+{
+	"command": "JAMRenumbering.showRenumberHTMLView",
+	"title": "JAM Open Renumber Tool"
+}			
+				]
 	},
 	"scripts": {
 		"lint": "eslint .",
