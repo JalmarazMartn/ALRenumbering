@@ -8,9 +8,9 @@ All the commands will be removed, and substituted bay a GUI with buttons. The GU
 
 ![New GUI](https://github.com/JalmarazMartn/ALRenumbering/blob/master/images/NewGUI.gif?raw=true)
 
-We can see 2 main secctions:
+We can see 2 main sections:
 
-1. Object renumber. Sections to invoke 3 actions for create, open and apply renumering from CSV file. Select and option and push right button execute.
+1. Object renumber. Sections to invoke 3 actions for create, open and apply renumering from CSV file. Select an option and push right button execute.
 2. Fields renumbering. The same of above but refered to fields in tableextensions.
 
 In the bottom we have 4 remaining commands (with a tooltip if you pass over the mouse):
