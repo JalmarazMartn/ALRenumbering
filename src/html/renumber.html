@@ -82,51 +82,40 @@
   <button onclick="executeAction('fields')">Execute</button>
   <br>
   <br>
-  <button onclick="clearFile()">
+  <button onclick="execAction('clearFile')">
     Clear File
     <span class="tooltiptext">Reset CSV File Path</span>
   </button>
-  <button onclick="generateEmptyObjects()">
+  <button onclick="execAction('generateEmptyObjects')">
     Generate Empty Objects
     <span class="tooltiptext">JAM Generate empty logic table objects in target folder</span>
   </button>
-  <button onclick="generateCSIDEEmptyObjects()">
+  <button onclick="execAction('generateCSIDEEmptyObjects')">
     Generate Empty C/SIDE Objects
     <span class="tooltiptext">JAM Generate empty logic C/AL table objects in target single txt file</span>
   </button>
-  <button onclick="insertFieldsCSIDE()">
+  <button onclick="execAction('insertFieldsCSIDE')">
     Insert Fields C/SIDE
     <span class="tooltiptext">JAM Insert extension fields into old CSIDE table definition text file</span>
   </button>
-  <button onclick="updatePrevFile()">
+  <button onclick="execAction('updatePrevFile')">
     Update previous CSV
     <span class="tooltiptext">JAM Update previous CSV Renumbering file with new objects in workspace</span>
   </button>
 <script>
     function executeAction(elementID = '') {
-      const messageAction = document.getElementById(elementID).value;
       const vscode = acquireVsCodeApi();
+      const messageAction = document.getElementById(elementID).value;
       vscode.postMessage({
         action: messageAction,
         renumType: elementID
       });
     }
-    function clearFile() {
-      vscode.postMessage({ action: 'clearFile' });
-    }
-
-    function generateEmptyObjects() {
-      vscode.postMessage({ action: 'generateEmptyObjects' });
-    }
-    function generateCSIDEEmptyObjects() {
-      vscode.postMessage({ action: 'generateCSIDEEmptyObjects' });
-    }
-    function insertFieldsCSIDE() {
-      vscode.postMessage({ action: 'insertFieldsCSIDE' });
-    }
-    function updatePrevFile()
+    function execAction(newAction)
     {
-      vscode.postMessage({ action: 'updatePrevFile' });
+      const vscode = acquireVsCodeApi();
+      vscode.postMessage({ action: newAction});
+      
     }
   </script>
 </body>

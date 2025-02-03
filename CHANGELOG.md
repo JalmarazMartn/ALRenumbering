@@ -129,3 +129,7 @@ Empty objects: Problem fixed in transfer code
 ### 0.2.10
 
 Command "JAM Open AL Renumber Tool" to open GUI to remove all previous commands in command bar
+
+### 0.2.11
+
+Errors in buttons execution
