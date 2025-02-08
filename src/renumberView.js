@@ -27,7 +27,7 @@ async function showCodeActionsHTMLView(context) {
             await createRenumberfile(message.renumType);
             break;
           case 'openCsv':
-            openCsv();
+            await openCsv();
             break;
           case 'renumber':
             execRenumber(message.renumType);

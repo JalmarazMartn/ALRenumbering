@@ -133,3 +133,7 @@ Command "JAM Open AL Renumber Tool" to open GUI to remove all previous commands 
 ### 0.2.11
 
 Errors in buttons execution
+
+### 0.2.12
+
+Changes in Page view

@@ -56,14 +56,31 @@
       visibility: visible;
       opacity: 1;
     }
+    .container {
+      display: flex;
+      align-items: flex-start; /* Align items to the top */
+      gap: 20px; /* Add some space between the sections */
+    }
+
+    .section {
+      /* Styles for each section (Object and Field Renumber) */
+      flex: 1; /* Ensures both sections take equal width */
+       /* Optional: Add borders or background colors for visual separation */
+      border: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }    
   </style>
 </head>
 
 <body>
 
-  <h1>Renumbering</h1>
-  <h2>Object renumber</h2>
-  <select id="objects">
+  <h1>Renumbering. Click a section to expand. Select an option and click execute.</h1>
+  <div class="container">
+  <div class="section">  <!-- Object Renumber Section -->
+  <details open>
+    <summary style="font-weight: bold; font-size: 1.5rem;">Object Renumber</summary>
+  <select id="objects" style="margin-left: 20px;">
     <option value="doNothing">Choose option bellow</option>
     <option value="createCsv">1 Create initial CSV File</option>
     <option value="openCsv">2 Open CSV File and fill new ids manually</option>
@@ -71,9 +88,23 @@
   </select>
   <button onclick="executeAction('objects')">Execute</button>
   <br>
-  <br>
-  <h2>Field extension renumber</h2>
-  <select id="fields">
+  <details style="margin-left: 20px;">
+    <summary>Explanation of Options</summary>
+    <p>
+      <strong>1. Create initial CSV File:</strong> This option generates a CSV file containing existing object IDs and names, preparing it for renumbering.  You can then manually edit this file to specify the new IDs.  This is the first step in the renumbering process.
+    </p>
+    <p>
+      <strong>2. Open CSV File and fill new ids manually:</strong> This option allows you to open the previously created CSV file and manually enter the desired new IDs for each object.</p>
+    <p>
+      <strong>3. Renumber objects from CSV File:</strong> This option executes the renumbering process based on the new IDs provided in the CSV file.  The objects in your project will be updated with the new IDs specified.
+    </p>
+  </details>  
+</details>
+</div> 
+<div class="section">  <!-- Field Renumber Section -->
+  <details open>
+    <summary style="font-weight: bold; font-size: 1.5rem;">Field extension Renumber</summary>    
+  <select id="fields" style="margin-left: 20px;">
     <option value="doNothing">Choose option bellow</option>
     <option value="createCsv">1 Create initial CSV File</option>
     <option value="openCsv">2 Open CSV File and fill new ids manually</option>
@@ -81,26 +112,39 @@
   </select>
   <button onclick="executeAction('fields')">Execute</button>
   <br>
+  <details  style="margin-left: 20px;">
+    <summary>Explanation of Options</summary>
+    <p><strong>1. Create initial CSV File:</strong> This option generates a CSV file containing existing field IDs and names, preparing it for renumbering. You can then manually edit this file to specify the new IDs. This is the first step in the renumbering process.</p>
+    <p><strong>2. Open CSV File and fill new ids manually:</strong> This option allows you to open the previously created CSV file and manually enter the desired new IDs for each field.</p>
+    <p><strong>3. Renumber objects from CSV File:</strong> This option executes the renumbering process based on the new IDs provided in the CSV file.  The fields in your project will be updated with the new IDs specified.</p>
+  </details>  
+</details>
+</div>
+</div>
   <br>
+<details>
+  <summary style="font-weight: bold; font-size: 1.5rem;">Other Actions</summary>      
+  <select id="otherActions"  style="margin-left: 20px;">
+    <option value="doNothing">Choose option below</option>
+    <option value="generateEmptyObjects">1 Generate Empty Objects</option>
+    <option value="generateCSIDEEmptyObjects">2 Generate Empty C/SIDE Objects</option>
+    <option value="insertFieldsCSIDE">3 Insert Fields C/SIDE</option>
+    <option value="updatePrevFile">4 Update previous CSV</option>
+  </select>
+  <button onclick="executeOtherAction()">Execute</button>
+  <br>
+  <details  style="margin-left: 20px;">
+    <summary>Explanation of Options</summary>
+    <p><strong>1. Generate Empty Objects:</strong>  Generates empty "logic" tables (copies of existing tables without internal code) and associated data transfer codeunits. You'll need to: 1) Specify a number range for the new object IDs and 2) Choose a target folder where the new objects will be created.
+    <p><strong>2. Generate Empty C/SIDE Objects:</strong> Generates empty "logic" C/AL table objects in a single target text file. You'll need to choose the target text file.
+    <p><strong>3. Insert Fields C/SIDE:</strong> JAM Insert extension fields into an existing C/SIDE table definition text file. You'll need to choose the target text file.</p>
+    <p><strong>4. Update previous CSV:</strong> JAM Update previous CSV Renumbering file with new objects in the workspace if changed from the time file was generated. You must choose a csv file.</p>
+  </details>
+</details>  
+<br>
   <button onclick="execAction('clearFile')">
-    Clear File
+    Clear Filename
     <span class="tooltiptext">Reset CSV File Path</span>
-  </button>
-  <button onclick="execAction('generateEmptyObjects')">
-    Generate Empty Objects
-    <span class="tooltiptext">JAM Generate empty logic table objects in target folder</span>
-  </button>
-  <button onclick="execAction('generateCSIDEEmptyObjects')">
-    Generate Empty C/SIDE Objects
-    <span class="tooltiptext">JAM Generate empty logic C/AL table objects in target single txt file</span>
-  </button>
-  <button onclick="execAction('insertFieldsCSIDE')">
-    Insert Fields C/SIDE
-    <span class="tooltiptext">JAM Insert extension fields into old CSIDE table definition text file</span>
-  </button>
-  <button onclick="execAction('updatePrevFile')">
-    Update previous CSV
-    <span class="tooltiptext">JAM Update previous CSV Renumbering file with new objects in workspace</span>
   </button>
 <script>
     function executeAction(elementID = '') {
@@ -114,9 +158,13 @@
     function execAction(newAction)
     {
       const vscode = acquireVsCodeApi();
-      vscode.postMessage({ action: newAction});
-      
+      vscode.postMessage({ action: newAction});      
     }
+    function executeOtherAction() {
+      const vscode = acquireVsCodeApi();
+      const selectedAction = document.getElementById("otherActions").value;
+      vscode.postMessage({ action: selectedAction });
+    }    
   </script>
 </body>
 
