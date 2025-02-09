@@ -22,6 +22,8 @@ In the bottom we have 4 remaining options in desplegable "Other Actions":
 
 Clear Filename Button: Clears the file path to allow the user to select a different file in "Open file" next execution.
 
+if you still want to enable commands in command palette check the setting JAMRenumbering.EnableCommandPalette.
+
 ## Features
 
 This Renumber implementation has two commands: "Create initial CSV file" and "JAM Renumber Al Objects from CSV file"
@@ -84,7 +86,9 @@ Visual Studio Code and AL language.
 
 ## Extension Settings
 
-No setup needed.
+This extension contributes the following settings:
+
+* `JAMRenumbering.EnableCommandPalette` If you want to use command palette instead renumbering tool webview check this setting.
 
 ## Known Issues
 

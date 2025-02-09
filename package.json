@@ -56,7 +56,52 @@
 				"command": "JAMRenumbering.showRenumberHTMLView",
 				"title": "JAM Open AL Renumber Tool"
 			}
-		]
+		],
+		"configuration": {
+			"title": "JAM Renumbering Tool",
+			"properties": {
+				"JAMRenumbering.EnableCommandPalette": {
+					"type": "boolean",
+					"default": false
+				}
+			}
+		},
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "JAMRenumbering.Renumber",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.CreateCSVFile",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.UpdatePreviousCSVFile",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.CreateTableObjectsWithoutLogic",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.CreateTableObjectsWithoutLogicCAL",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.InsertExtensionFieldsInCSIDEFile",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.CreateCSVTableExtFieldsFile",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				},
+				{
+					"command": "JAMRenumbering.RenumberFields",
+					"when": "config.JAMRenumbering.EnableCommandPalette"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"lint": "eslint .",
