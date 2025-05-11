@@ -126,19 +126,21 @@
   <summary style="font-weight: bold; font-size: 1.5rem;">Other Actions</summary>      
   <select id="otherActions"  style="margin-left: 20px;">
     <option value="doNothing">Choose option below</option>
-    <option value="generateEmptyObjects">1 Generate Empty Objects</option>
-    <option value="generateCSIDEEmptyObjects">2 Generate Empty C/SIDE Objects</option>
-    <option value="insertFieldsCSIDE">3 Insert Fields C/SIDE</option>
-    <option value="updatePrevFile">4 Update previous CSV</option>
+    <option value="generateEmptyObjects">1 Generate Empty Objects with new IDS</option>
+    <option value="generateEmptyObjectsKeepIds">2 Generate Empty Objects keeping old IDS</option>
+    <option value="generateCSIDEEmptyObjects">3 Generate Empty C/SIDE Objects</option>
+    <option value="insertFieldsCSIDE">4 Insert Fields C/SIDE</option>
+    <option value="updatePrevFile">5 Update previous CSV</option>
   </select>
   <button onclick="executeOtherAction()">Execute</button>
   <br>
   <details  style="margin-left: 20px;">
     <summary>Explanation of Options</summary>
-    <p><strong>1. Generate Empty Objects:</strong>  Generates empty "logic" tables (copies of existing tables without internal code) and associated data transfer codeunits. You'll need to: 1) Specify a number range for the new object IDs and 2) Choose a target folder where the new objects will be created.
-    <p><strong>2. Generate Empty C/SIDE Objects:</strong> Generates empty "logic" C/AL table objects in a single target text file. You'll need to choose the target text file.
-    <p><strong>3. Insert Fields C/SIDE:</strong> JAM Insert extension fields into an existing C/SIDE table definition text file. You'll need to choose the target text file.</p>
-    <p><strong>4. Update previous CSV:</strong> JAM Update previous CSV Renumbering file with new objects in the workspace if changed from the time file was generated. You must choose a csv file.</p>
+    <p><strong>1. Generate Empty Objects:</strong>Generates empty "logic" tables (copies of existing tables without internal code) and associated data transfer codeunits. Tableextensions will be converted in tables keeping the PK of the extended table. You'll need to: 1) Specify a number range for the new object IDs and 2) Choose a target folder where the new objects will be created.
+    <p><strong>2. Generate Empty Objects keeping old IDS:</strong> Empty App. Generates empty "logic" tables and tableextensions. Keep number and name of objects and tableextensions remain tablextensions.<br><strong>Steps:</strong><br>Create an empty app with AL:GO<br>Execute this option and select new workspace folder<br>Then the action will create the same tables and tablextensions in the new app and replace app.json to get the same app with only data</table></p>
+    <p><strong>3. Generate Empty C/SIDE Objects:</strong> Generates empty "logic" C/AL table objects in a single target text file. You'll need to choose the target text file.
+    <p><strong>4. Insert Fields C/SIDE:</strong> JAM Insert extension fields into an existing C/SIDE table definition text file. You'll need to choose the target text file.</p>
+    <p><strong>5. Update previous CSV:</strong> JAM Update previous CSV Renumbering file with new objects in the workspace if changed from the time file was generated. You must choose a csv file.</p>
   </details>
 </details>  
 <br>

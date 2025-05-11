@@ -137,3 +137,7 @@ Errors in buttons execution
 ### 0.2.12
 
 Changes in Page view
+
+### 0.2.13
+
+Two options for empty tables: create an empty app with same id or temporary tables to create an upgrade app.

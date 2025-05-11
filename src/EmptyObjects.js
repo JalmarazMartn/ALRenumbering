@@ -7,19 +7,48 @@ const carriage = '\r\n';
 const ObjectCaption = 'OBJECT';
 module.exports = {
 	CreateTableObjectsWithoutLogic: function () {
-		CreateTableObjectsWithoutLogicGeneric();
+		CreateUpgradeApp();
 	},
 	CreateTableObjectsWithoutLogicCAL: function () {
 		CreateTableObjectsWithoutLogicGenericCSIDE();
 	},
-	ConvertObjectTextToCAL: function (ObjectText) { return ConvertObjectTextToCAL(ObjectText) }
+	ConvertObjectTextToCAL: function (ObjectText) { return ConvertObjectTextToCAL(ObjectText) },
+	CreateEmptyAppObjects: function () {
+		CreateEmptyApp();
+	}
 }
-async function CreateTableObjectsWithoutLogicGeneric() {
-	const fromObjectNumber = await getFromObjectNumer();
-	if (fromObjectNumber == 0) { return; }
+async function CreateUpgradeApp() {
+	const FolderName = await SelectFolder();
+	let fromObjectNumber = 0;
+	fromObjectNumber = await getFromObjectNumer();
+	if (fromObjectNumber == 0) {
+		return;
+	}
+	CreateTableObjectsWithoutLogicGeneric(false, fromObjectNumber, FolderName[0].fsPath);
+}
+async function CreateEmptyApp() {
+	const fs = require('fs');
+	const FolderName = await SelectFolder();
+	//add src folder to path
+	const srcFolder = FolderName[0].fsPath + '\\src';
+	if (!fs.existsSync(srcFolder)) {
+		vscode.window.showErrorMessage('src folder not found in path: ' + FolderName[0].fsPath);
+		return;
+	}
+	CreateTableObjectsWithoutLogicGeneric(true, 0, srcFolder);
+	//ask before if copy app.json
+	const copyAppJson = await vscode.window.showInformationMessage('Do you want to copy app.json to new app?', { modal: true }, { title: 'Yes' }, { title: 'No' });
+	const fromFile = vscode.Uri.file(vscode.workspace.workspaceFolders[0].uri.fsPath + '\\app.json');
+	if (fs.existsSync(fromFile.fsPath)) {
+		if (copyAppJson.title == 'Yes') {
+			const toFile = vscode.Uri.file(FolderName[0].fsPath + '\\app.json');
+			await vscode.workspace.fs.copy(fromFile, toFile, { overwrite: true });
+		}
+	}
+}
+async function CreateTableObjectsWithoutLogicGeneric(KeepIDAndType = false, fromObjectNumber = 0, FolderName) {
 	let emptyObjectNumber = fromObjectNumber;
 	let codeunitDataT = '';
-	const FolderName = await SelectFolder();
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');
 	let saveToProcedure = 'local procedure SaveTables()' + carriage + 'begin' + carriage;
 	let backToProcedure = 'local procedure BackToTables()' + carriage + 'begin' + carriage;
@@ -27,23 +56,32 @@ async function CreateTableObjectsWithoutLogicGeneric() {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
 		if (IsTableObject(DeclarationLineText)) {
-			let ALDocExtended = {};
-			await WriteFileWithOutCode(ALDocument, FolderName[0].fsPath, emptyObjectNumber);
-			if (Library.IsTableExtensionObject(Library.GetDeclarationLineText(ALDocument))) {
-				ALDocExtended = await Library.getALDocExtended(ALDocument);
+			await WriteFileWithOutCode(ALDocument, FolderName, emptyObjectNumber, KeepIDAndType);
+			if (!KeepIDAndType) {
+				({ codeunitDataT, saveToProcedure, backToProcedure } = await WriteTransferCodeunit(ALDocument, emptyObjectNumber, codeunitDataT, saveToProcedure, backToProcedure));
+				emptyObjectNumber = emptyObjectNumber + 1;
 			}
-			const transferProcElements = getTransferProcedure(ALDocument, emptyObjectNumber, ALDocExtended);//aqui
-			codeunitDataT = codeunitDataT + transferProcElements[0] + transferProcElements[2];
-			saveToProcedure = saveToProcedure + transferProcElements[1] + ';' + carriage;
-			backToProcedure = backToProcedure + transferProcElements[3] + ';' + carriage;
-			emptyObjectNumber = emptyObjectNumber + 1;
 		}
 	}
 	saveToProcedure = saveToProcedure + 'end;' + carriage;
 	backToProcedure = backToProcedure + 'end;' + carriage;
 	codeunitDataT = saveToProcedure + backToProcedure + codeunitDataT;
-	createCodeunitFile(codeunitDataT, fromObjectNumber, FolderName[0].fsPath);
-	vscode.window.showInformationMessage('Review new transfer codeunit and empty tables from table extensions.');
+	if (!KeepIDAndType) {
+		createCodeunitFile(codeunitDataT, fromObjectNumber, FolderName);
+		vscode.window.showInformationMessage('Review new transfer codeunit and empty tables from table extensions.');
+	}
+}
+
+async function WriteTransferCodeunit(ALDocument, emptyObjectNumber, codeunitDataT, saveToProcedure, backToProcedure) {
+	let ALDocExtended = {};
+	if (Library.IsTableExtensionObject(Library.GetDeclarationLineText(ALDocument))) {
+		ALDocExtended = await Library.getALDocExtended(ALDocument);
+	}
+	const transferProcElements = getTransferProcedure(ALDocument, emptyObjectNumber, ALDocExtended);
+	codeunitDataT = codeunitDataT + transferProcElements[0] + transferProcElements[2];
+	saveToProcedure = saveToProcedure + transferProcElements[1] + ';' + carriage;
+	backToProcedure = backToProcedure + transferProcElements[3] + ';' + carriage;
+	return { codeunitDataT, saveToProcedure, backToProcedure };
 }
 
 async function CreateTableObjectsWithoutLogicGenericCSIDE() {
@@ -53,7 +91,7 @@ async function CreateTableObjectsWithoutLogicGenericCSIDE() {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index])
 		const DeclarationLineText = ALDocument.lineAt(0).text;
 		if (IsTableObject(DeclarationLineText)) {
-			let ObjectText = GetAllEmptyObjectContent(ALDocument, {});
+			let ObjectText = GetAllEmptyObjectContent(ALDocument, {}, false);
 			ObjectText = ConvertObjectTextToCAL(ObjectText);
 			if (Library.IsTableExtensionObject(DeclarationLineText)) {
 				ObjectText = '';
@@ -98,9 +136,9 @@ function IsTableObject(DeclarationLineText = '') {
 	}
 	return Library.IsTableExtensionObject(DeclarationLineText);
 }
-async function WriteFileWithOutCode(ALDocument, FolderName = '', emptyObjectNumber = 0) {
+async function WriteFileWithOutCode(ALDocument, FolderName = '', emptyObjectNumber = 0, KeepIDAndType = false) {
 	const ALDocExtended = await Library.getALDocExtended(ALDocument);
-	let FinalText = GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended);
+	let FinalText = GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended, KeepIDAndType);
 	if (FinalText == '') {
 		return;
 	}
@@ -108,17 +146,26 @@ async function WriteFileWithOutCode(ALDocument, FolderName = '', emptyObjectNumb
 	const fileUri = vscode.Uri.file(FolderName + '/' + 'Empty.' + OnlyName);
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
 }
-function GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended) {
+function GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended, KeepIDAndType = false) {
 	let Library = require('./Library');
 	let FinalText = '';
 	let fieldsText = Library.GetFieldsText(ALDocument);
-	if (ALDocExtended) {
-		fieldsText = Library.getOnlyFieldsKeyText(ALDocExtended) + carriage + fieldsText;
+	if (!KeepIDAndType) {
+		if (ALDocExtended) {
+			fieldsText = Library.getOnlyFieldsKeyText(ALDocExtended) + carriage + fieldsText;
+		}
 	}
-	let FinalFieldsText = GetFinalFieldsText(fieldsText);	
-	FinalText = FinalText + convertDeclarationLineText(Library.GetDeclarationLineText(ALDocument), emptyObjectNumber) + carriage;
+	let FinalFieldsText = GetFinalFieldsText(fieldsText);
+	if (!KeepIDAndType) {
+		FinalText = FinalText + convertDeclarationLineText(Library.GetDeclarationLineText(ALDocument), emptyObjectNumber) + carriage;
+	}
+	else {
+		FinalText = FinalText + Library.GetDeclarationLineText(ALDocument) + carriage;
+	}
 	FinalText = FinalText + '{' + carriage;
-	FinalText = FinalText + 'DataClassification = CustomerContent;' + carriage;
+	if (!KeepIDAndType || !Library.IsTableExtensionObject(Library.GetDeclarationLineText(ALDocument))) {
+		FinalText = FinalText + 'DataClassification = CustomerContent;' + carriage;
+	}
 	FinalText = FinalText + FinalFieldsText + carriage;
 	if (FinalFieldsText == '') {
 		return '';
@@ -127,8 +174,10 @@ function GetAllEmptyObjectContent(ALDocument, emptyObjectNumber, ALDocExtended) 
 		FinalText = FinalText + GetFinalKeysText(ALDocument) + carriage;
 	}
 	else {
-		if (ALDocExtended) {
-			FinalText = FinalText + GetFinalKeysText(ALDocExtended) + carriage;
+		if (!KeepIDAndType) {
+			if (ALDocExtended) {
+				FinalText = FinalText + GetFinalKeysText(ALDocExtended) + carriage;
+			}
 		}
 	}
 	FinalText = FinalText + '}';
@@ -216,8 +265,8 @@ function getTransferProcedure(ALDocument, newObjectNumber, ALDocExtended) {
 	let FieldAddValueText = '';
 	const realFieldList = Library.getRealFieldList(ALDocument);
 	for (let index = 0; index < realFieldList.length; index++) {
-			const fieldName = realFieldList[index];
-			FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;		
+		const fieldName = realFieldList[index];
+		FieldAddValueText = FieldAddValueText + 'DataTransfer.AddFieldValue(FromTable.fieldno(' + fieldName + '), ToTable.fieldno(' + fieldName + '));' + carriage;
 	}
 	let primaryKeySave = '';
 	let primaryKeyBack = '';

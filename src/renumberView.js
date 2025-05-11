@@ -39,6 +39,10 @@ async function showCodeActionsHTMLView(context) {
             const EmptyObjects = require('./EmptyObjects.js');
             EmptyObjects.CreateTableObjectsWithoutLogic();
             break;
+          case 'generateEmptyObjectsKeepIds':
+            const EmptyObjectsKeepIds = require('./EmptyObjects.js');
+            EmptyObjectsKeepIds.CreateEmptyAppObjects();
+            break;
           case 'generateCSIDEEmptyObjects':
             const EmptyObjectsCAL = require('./EmptyObjects.js');
             EmptyObjectsCAL.CreateTableObjectsWithoutLogicCAL();

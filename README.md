@@ -15,14 +15,19 @@ We can see 2 main sections:
 
 In the bottom we have 4 remaining options in desplegable "Other Actions":
 
-1. Generate empty Objects action.
-2. Generate empty C/SIDE Objects action.
-3. Insert fields C/SIDE.
-4. Update CSV with new objects.
+1. Generate empty Objects with new IDs action.
+2. Generate empty Objects keeping old IDs action.
+3. Generate empty C/SIDE Objects action.
+4. Insert fields C/SIDE.
+5. Update CSV with new objects.
 
 Clear Filename Button: Clears the file path to allow the user to select a different file in "Open file" next execution.
 
 if you still want to enable commands in command palette check the setting JAMRenumbering.EnableCommandPalette.
+
+The diference between 1 and 2 empty object options is that the first one will generate new IDs for all objects, and the second one will keep the old IDs and copy them to a new workspace, copying also the app.json file. This is useful when you need to create the same app, with the same objects IDs, the same App ID, and no logic to have no issues when publishing, for example in an on-premise environment, with an earlier version of BC. Then the logic could not work in this version, and it rather have only data objects for further cloud upload. Check the page explanation for more details.
+
+Option 1 create an upgrading app with new IDS, and tables instead tableextensions, and no logic. Also create a new codeunit with datatransfer to save and to bring back data to the new tables.
 
 ## Features
 
