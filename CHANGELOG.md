@@ -141,3 +141,7 @@ Changes in Page view
 ### 0.2.13
 
 Two options for empty tables: create an empty app with same id or temporary tables to create an upgrade app.
+
+### 0.2.14
+
+Ask for a default number id in Create intial CSV file option. The system will suggest new ids based in this intial default number end write them in the CSV file. The user can change the number in the CSV file if he wants to use another number.

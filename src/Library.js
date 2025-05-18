@@ -15,8 +15,9 @@ module.exports = {
 		ProcessRenumFile(ProcessWorkSpace);
 	},
 	CreateNewCSVFile: async function () {
-		let EmptyRenumberJSON = [];
-		return await CreateCSVFile(EmptyRenumberJSON);
+		//let EmptyRenumberJSON = [];
+		//return await CreateCSVFile(EmptyRenumberJSON);
+		return await CreateCSVFile();
 	},
 	UpdatePreviousCSVFile: function () {
 		ProcessRenumFile(CreateCSVFile);
@@ -63,6 +64,14 @@ module.exports = {
 	getOnlyFieldsKeyText: function(ALDocument)
 	{
 		return getOnlyFieldsKeyText(ALDocument);
+	}
+	,
+	getNumberWithInputBox: async function () {
+		return await getNumberWithInputBox();
+	}
+	,
+	getNextObjectNumber: function (firstObjNumber, objLastNumbers, groupCriteria = '') {
+		return getNextObjectNumber(firstObjNumber, objLastNumbers, groupCriteria);
 	}
 }
 
@@ -175,17 +184,25 @@ async function ProcessRenumFile(EndProccesingFuntcion) {
 }
 async function CreateCSVFile(RenumberJSON) {
 	const sep = ';';
-
+	let firstObjNumber = '';
+	let objLastNumbers = [];
+	if (!RenumberJSON) {		
+	firstObjNumber = await getNumberWithInputBox();
+	}
 	var WorkspaceObjects = await GetWorkspaceObjects();
 	let fileUri = await vscode.window.showSaveDialog(optionsCSVFile('Save'));
 	var LineText = 'ObjectType' + sep + 'OldId' + sep + 'Name' + sep + 'NewId' + carriage;
 	let NewId = '';
 	let DeclarationText = '';
 	for (let index = 0; index < WorkspaceObjects.length; index++) {
+		NewId = '';
 		if (RenumberJSON) {
 			DeclarationText = WorkspaceObjects[index].ObjectType + ' ' + WorkspaceObjects[index].ObjectID +
 				' ' + WorkspaceObjects[index].ObjectName;
 			NewId = FindNumberRelation(DeclarationText, RenumberJSON).NewID;
+		}
+		if (NewId == '') {		
+			NewId = getNextObjectNumber(firstObjNumber, objLastNumbers,WorkspaceObjects[index].ObjectType);
 		}
 		LineText = LineText + WorkspaceObjects[index].ObjectType + sep + WorkspaceObjects[index].ObjectID + sep +
 			WorkspaceObjects[index].ObjectName + sep + NewId + carriage;
@@ -194,6 +211,23 @@ async function CreateCSVFile(RenumberJSON) {
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
 	return fileUri.path;
 }
+async function getNumberWithInputBox() {
+	let firstObjNumber = await vscode.window.showInputBox({ 
+    valueSelection: [50000, 9999999], 
+    prompt: "Type initial ID (5 or 7 digits) to number the new IDS from by defalut",
+    value: "50000",
+    placeHolder: "Enter a 5 or 7-digit number",
+    validateInput: text => {
+        return /^\d{5}(\d{2})?$/.test(text) ? null : 'Please enter a 5 or 7-digit number';
+    }
+	});
+	if (!firstObjNumber) {
+		vscode.window.showErrorMessage('No number entered');
+		return '';
+	}
+	return firstObjNumber;
+}
+
 function originalObjectName(OldName = '') {
 	var extendsPosition = OldName.search(/\s+extends\s+/i);
 	if (extendsPosition < 0) {
@@ -412,4 +446,21 @@ function isKeyField(fieldName, primaryKeyFields) {
 		{return true}
 	}
 	return false;
+}
+function getNextObjectNumber(firstObjNumber, objLastNumbers, groupCriteria='') {
+	if (firstObjNumber == '') {
+		return '';
+	}	
+	let objLastNumber = objLastNumbers.find(Obj => Obj.ObjType == groupCriteria);
+	if (objLastNumber) {
+		objLastNumber.ObjNumber = objLastNumber.ObjNumber + 1;
+		return objLastNumber.ObjNumber.toString();
+	}
+	objLastNumber = {
+		ObjType: groupCriteria,
+		ObjNumber: parseInt(firstObjNumber)
+	};
+	objLastNumbers.push(
+		objLastNumber);
+		return objLastNumber.ObjNumber.toString();
 }

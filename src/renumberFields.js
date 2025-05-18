@@ -17,18 +17,22 @@ module.exports = {
 
 async function CreateCSVTableExtFieldsFile() {
 	const sep = ';';
+	let firstObjNumber = '';
 	const AllDocs = await vscode.workspace.findFiles('**/*.{al}');    
 	var FinalText = 'TablexExtNumber' + sep + 'OriginalTable'+ sep +'FieldId' + sep + 'FieldName' + sep + 'NewFieldId' + carriage;
+	const Library = require('./Library.js');
+	firstObjNumber = await Library.getNumberWithInputBox();
+	let objLastNumbers = [];
 	for (let index = 0; index < AllDocs.length; index++) {
 		var ALDocument = await vscode.workspace.openTextDocument(AllDocs[index]);
-        FinalText = FinalText + await GetFieldsTextFromTableExtension(ALDocument);
+        FinalText = FinalText + await GetFieldsTextFromTableExtension(ALDocument,firstObjNumber,objLastNumbers);
 	}
     let fileUri = await vscode.window.showSaveDialog(optionsCSVFile('Save'));
 	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(FinalText));
 	vscode.window.showInformationMessage('CSV file created in ' + fileUri.path);
 	return fileUri.path;
 }
-async function GetFieldsTextFromTableExtension(ALDocument) {
+async function GetFieldsTextFromTableExtension(ALDocument, firstObjNumber, objLastNumbers) {
     const DeclarationLineText = Library.GetDeclarationLineText(ALDocument);
     if ((DeclarationLineText.search(/tableextension/i) < 0)) {
         return '';
@@ -43,7 +47,9 @@ async function GetFieldsTextFromTableExtension(ALDocument) {
 	for (let index = 1; index < ALDocument.lineCount - 1; index++) {        
 		let matchField = ALDocument.lineAt(index).text.match(regexpField);
 		if (matchField) {			
-            fieldsText +=  tableExtDeclaration[1] + sep + tableExtDeclaration[2] + sep +matchField[1] + sep + matchField[2] + sep + carriage;
+			const Library = require('./Library.js');
+			const NewID = await Library.getNextObjectNumber(firstObjNumber, objLastNumbers,tableExtDeclaration[1]);
+            fieldsText +=  tableExtDeclaration[1] + sep + tableExtDeclaration[2] + sep +matchField[1] + sep + matchField[2] + sep + NewID+ carriage;
 		}
 	}
     return fieldsText;
